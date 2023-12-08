@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wire Cat</title>
+    <link rel="stylesheet" href="static/css/main.css">
+</head>
+<body>
+    <div class="header">
+        <h1 class = "logo">Wire Cat</h1>
+        <a href="/blog">Blog</a>
+        <a href="/news">News</a>
+        <a href="/home">Home</a>
+        <a href="/search">Search</a>
+    </div>
+    <div class="main">
+        <div class="best-posts">
+            {% for p in best_posts %}
+                <div class="post">
+                    <p class="post-text">{{p.text}}</p>
+                    <img src="{{p.image}}" alt="">
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <p>Thanks for coming</p>
+</body>
+</html>

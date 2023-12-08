@@ -1,0 +1,25 @@
+body {
+    display: grid;
+    grid-template-columns: 1fr 2.5fr 1fr;
+    grid-template-rows: 1fr 2fr 5fr;
+}
+
+.main {
+    grid-column-start: 2;
+    grid-row-start: 2;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(5, 155);
+}
+.post {
+    display: flex;
+}
+.post img {
+    height: 150px;
+}
+
+.best-posts {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
