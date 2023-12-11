@@ -11,11 +11,30 @@ body {
     grid-template-columns: 1fr;
     grid-template-rows: repeat(5, 155);
 }
+
+.header {
+    align-items: end;
+    grid-column-start: 1;
+    grid-column-end: 4;
+    display: flex;
+    justify-content: space-between;
+}
+
+.header-logo {
+    height: 150px;
+    padding: 1em;
+}
+
+.nav a{
+    font-size: large;
+    padding-left: 50px;
+    padding-right: 1em;
+}
 .post {
     display: flex;
 }
 .post img {
-    height: 150px;
+    height: 100px;
 }
 
 .best-posts {

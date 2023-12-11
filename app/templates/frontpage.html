@@ -1,0 +1,33 @@
+{% extends "main.html" %}
+
+{% block title %}WIRECAT Home{% endblock %}
+
+{% block content %}
+    <div class="best-posts">
+        <h2>Best Posts</h2>
+        {% for p in best_posts %}
+            <div class="post">
+                <p class="post-text">{{p.text}}</p>
+                <img src="{{p.image}}" alt="" class="post-image">
+            </div>
+        {% endfor %}
+    </div>
+    <div class="best-posts">
+        <h2>Best Posts</h2>
+        {% for p in best_posts %}
+            <div class="post">
+                <p class="post-text">{{p.text}}</p>
+                <img src="{{p.image}}" alt="" class="post-image">
+            </div>
+        {% endfor %}
+    </div>
+    <div class="best-posts">
+        <h2>Best Posts</h2>
+        {% for p in best_posts %}
+            <div class="post">
+                <p class="post-text">{{p.text}}</p>
+                <img src="{{p.image}}" alt="" class="post-image">
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

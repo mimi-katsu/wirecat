@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/')
 def home():
     best = get_best_posts()
-    return render_template('index.html', best_posts=best)
+    return render_template('frontpage.html', best_posts=best)
 
 
 def get_best_posts():
