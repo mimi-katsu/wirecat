@@ -1,7 +1,14 @@
 <img src="../static/images/wirecat-logo.png" alt="Wirecat Logo" class="header-logo">
 
 <div class="nav">
-    <a href="/news">News</a>
-    <a href="/home">Home</a>
-    <a href="/downloads">Search</a>
+    <form action="/home" method="post" id="search">
+        <label for="search-bar">Search</label>
+        <input type="text" id="search-bar">
+        <button type="submit">Go</button>
+    </form>
+    <div class="buttons">
+        <a href="/news">News</a>
+        <a href="/home">Home</a>
+        <a href="/downloads">Downloads</a>
+    </div>
 </div>

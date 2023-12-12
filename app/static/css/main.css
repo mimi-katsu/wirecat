@@ -21,12 +21,21 @@ body {
 }
 
 .header-logo {
-    height: 150px;
+    height: 8em;
     padding: 1em;
 }
 
+.nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}   
+.nav form {
+    background-color: gray;
+}
 .nav a{
-    font-size: large;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 2em;
     padding-left: 50px;
     padding-right: 1em;
 }
