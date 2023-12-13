@@ -1,12 +1,78 @@
+:root {
+    --background-color-main: white;
+    --background-color-secondary: grey;
+    --background-color-tertiary: white;
+    --border-color-main: black;
+    --border-color-secondary: black;
+    --border-color-tertiary: black;
+    --font-color-main: black;
+    --font-color-secondary: black;
+    --font-color-tertiary: black;
+
+    background-color: var(--background-color-main);
+}
+/*
+  1. Use a more-intuitive box-sizing model.
+*/
+*, *::before, *::after {
+    box-sizing: border-box;
+  }
+  /*
+    2. Remove default margin
+  */
+  * {
+    margin: 0;
+  }
+  /*
+    Typographic tweaks!
+    3. Add accessible line-height
+    4. Improve text rendering
+  */
+  body {
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
+    grid-template-rows: 1fr 50px 5fr 1fr;
+    
+    
+  }
+  /*
+    5. Improve media defaults
+  */
+  img, picture, video, canvas, svg {
+    display: block;
+    max-width: 100%;
+  }
+  /*
+    6. Remove built-in form typography styles
+  */
+  input, button, textarea, select {
+    font: inherit;
+  }
+  /*
+    7. Avoid text overflows
+  */
+  p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+  }
+  /*
+    8. Create a root stacking context
+  */
+  #root, #__next {
+    isolation: isolate;
+  }
+
 body {
     display: grid;
     grid-template-columns: 1fr 3fr 1fr;
-    grid-template-rows: 1fr 5fr 1fr;
+    grid-template-rows: 1fr 50px 5fr 1fr;
 }
 
 .content {
     grid-column-start: 2;
-    grid-row-start: 2;
+    grid-row-start: 3;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: repeat(5, 155);
@@ -16,12 +82,18 @@ body {
     display: grid;
     overflow: hidden;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 61px 25px 25px;
-    /* background-color: grey; */
+    grid-template-rows: 62px 25px 25px;
+    background-color: var(--background-color-main);
     grid-column-start: 1;
     grid-column-end: 4;
 }
 
+svg {
+    fill: var(--border-color);
+    max-width: 500px;
+    width: auto;
+    height: 100px;
+}
 .header-logo {
     z-index: 2;
     position: relative;
@@ -29,6 +101,7 @@ body {
     left: 0;
     height: 100px;
     padding: 15px;
+    
 }
 
 #search {
@@ -56,27 +129,34 @@ body {
     grid-row-start: 3;
     grid-column-start: 1;
     grid-column-end: 5;
-    background-color: black;
+    background-color: var(--border-color);
     overflow: hidden;
 }
 
 .white-block {
     z-index: 1;
     position: relative;
-    left: 150px;
+    left: 151px;
     bottom: 15px;
-    overflow: hidden;
     grid-row-start: 3;
     grid-column-start: 1;
     grid-column-end: 2;
-    background-color: white;
+    background-color: var(--background-color-main);
     height: 40px;
     width: 60px;
     transform: rotate(72deg);
     
 }
 .white-line {
-    background-color: white;
+    background-color: var(--background-color-main);
+}
+
+.announcements {
+    grid-row-start: 2;
+    grid-column-start: 1;
+    grid-column-end: 5;
+    border-bottom: 2px;
+    border-bottom: solid 2px var(--border-color);
 }
 .post {
     display: flex;
@@ -95,6 +175,6 @@ body {
 .footer {
     grid-column-start: 1;
     grid-column-end: 4;
-    grid-row-start: 3;
+    grid-row-start: 4;
     background-color: grey;
 }
