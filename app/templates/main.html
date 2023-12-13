@@ -10,8 +10,14 @@
     <div class="header">
         {% include 'header.html' %}
     </div>
-    <div class="main">
+    <div class="sidebar">
+        {% include 'sidebar.html' %}
+    </div>
+    <div class="content">
         {% block content %}{% endblock %}
+    </div>
+    <div class="footer">
+        {% include 'footer.html' %}
     </div>
 </body>
 </html>
