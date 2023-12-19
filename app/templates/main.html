@@ -10,18 +10,16 @@
     <div class="header">
         {% include 'header.html' %}
     </div>
-    <div class="nav">
-        
-        <div class="buttons">
-            <a href="/home">Home</a>
-            <a href="/community">Community</a>
-            <a href="/Downloads">Downloads</a>
-            <a href="/Guides">Guides</a>
-            <a href="/Videos">Videos</a>
-        </div>
+    <div class="status-bar">
+        <a href="/home" class="feed">This is a test feed item</a>
+        <p class="status">This is a test status bar!</p>
+        <a href="/home" class="alert">This is something else!</a>
     </div>
-    <div class="sidebar">
-        {% include 'sidebar.html' %}
+    <div class="sidebar-left">
+        {% include 'sidebar-left.html' %}
+    </div>
+    <div class="sidebar-right">
+        {% include 'sidebar-right.html' %}
     </div>
     <div class="content">
         {% block content %}{% endblock %}

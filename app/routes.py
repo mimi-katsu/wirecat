@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 import os
 from app import app
+
 @app.route('/home')
 @app.route('/index')
 @app.route('/')
@@ -20,5 +21,8 @@ def get_best_posts():
 
     return posts
 
+@app.route('/downloads')
+def downloads():
+    return 'Downloads'
 if __name__ == '__main__':
     app.run(debug=True)
