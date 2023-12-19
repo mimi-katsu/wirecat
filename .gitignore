@@ -1,2 +1,4 @@
 raw-image
 *.pyc
+.venv
+__pycache__
