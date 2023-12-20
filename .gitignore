@@ -2,3 +2,4 @@ raw-image
 *.pyc
 .venv
 __pycache__
+db
