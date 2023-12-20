@@ -24,5 +24,10 @@ def get_best_posts():
 @app.route('/downloads')
 def downloads():
     return 'Downloads'
+
+@app.route('/community')
+def community():
+    return 'Community'
 if __name__ == '__main__':
     app.run(debug=True)
+
