@@ -2,9 +2,11 @@ from flask import Flask, render_template, request
 import os
 from app import app
 from app.util.wirecat import WireCat
+from app.util.secrets import Secrets
 
 wirecat = WireCat()
 wirecat.posts.update(wirecat.db.get_recent_posts())
+s = Secrets()
 
 @app.route('/home')
 @app.route('/index')
@@ -34,11 +36,12 @@ def blog_post(post_id):
 
 @app.route('/blog/add', methods=['POST', 'GET'])
 def add_post():
-    if request.method == 'POST' and request.headers.get('Content-Type') == 'application/json':
-
+    if request.headers.get('auth') != s.get_author_key():
+        return 'Forbidden', 403
+    elif request.method == 'POST' and request.headers.get('Content-Type') == 'application/json':
         return f"Post added\nDATA: {request.get_json()}"
     else:
-        return 'Error: Post add failed', 403
+        return 'Error: Post add failed', 404
 
 @app.route('/blog/edit/<post_id>')
 def edit_post():
@@ -50,5 +53,8 @@ def delete_post():
 
 @app.route('/blog/update')
 def update_posts():
-    wirecat.posts.update(wirecat.db.get_recent_posts())
-    return 'posts updated', 200
+    if request.headers.get('auth') != s.get_author_key():
+        return 'Forbidden', 403
+    else:
+        wirecat.posts.update(wirecat.db.get_recent_posts())
+        return 'posts updated', 200
