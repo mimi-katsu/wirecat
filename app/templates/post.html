@@ -1,0 +1,15 @@
+{% extends 'blog.html' %}
+
+{% block post %}
+<div class="post-head">
+    <h1>{{post.title}}</h1>
+    <p>{{post.publish_date}}</p>
+    <p>By, {{post.author}}</p>
+    <p>{{post.summary}}</p>
+
+</div>
+<div class="post-content">
+    {{post.html_content | safe}}
+</div>
+
+{% endblock %}
