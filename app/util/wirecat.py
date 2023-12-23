@@ -31,7 +31,6 @@ class Database:
         return connection
 
     def create_post(self, post:object):
-        
         conn = self.init_db()
         cursor = conn.cursor()
         cursor.execute("""INSERT INTO posts (

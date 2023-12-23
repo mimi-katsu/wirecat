@@ -17,7 +17,7 @@ class Post:
         self.tags = tags
         self.generate_id()
 
-    def generate_id(self, length=5):
+    def generate_id(self, length=8):
         '''create an alphanumeric post id if it doesn't exist already'''
         if not self.id:
             characters = string.ascii_letters + string.digits 
