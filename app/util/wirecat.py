@@ -53,28 +53,25 @@ class Database:
         conn.close()
         return posts
 
-# db = Database()
+db = Database()
 
-# post1 = Post()
-# post1.title = "Post 1"
-# post1.summary = "This is a summary of post ONE, its just a small amount of text that describes the post"
-# post1.author = "Maia"
-# post1.html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>"""
-# db.create_post(post1)
+post1 = Post()
+post1.title = "Post 1"
+post1.summary = "This is a summary of post ONE, its just a small amount of text that describes the post"
+post1.author = "Maia"
+post1.html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>"""
+db.create_post(post1)
 
-# post2 = Post()
-# post2.title = "Post 2"
-# post2.summary = "This is a summary of post TWOoowwoo, its just a small amount of text that describes the post"
-# post2.author = "Maia"
-# post2.html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>"""
-# db.create_post(post2)
+post2 = Post()
+post2.title = "Post 2"
+post2.summary = "This is a summary of post TWOoowwoo, its just a small amount of text that describes the post"
+post2.author = "Maia"
+post2.html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>"""
+db.create_post(post2)
 
-# post3 = Post()
-# post3.title = "Post 3"
-# post3.summary = "This is a summary of post THREEEE, its just a small amount of text that describes the post"
-# post3.author = "Maia"
-# post3.html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>"""
-# db.create_post(post3)
-
-# for p in db.get_recent_posts():
-#     print(p.html_content, p.publish_date)
+post3 = Post()
+post3.title = "Post 3"
+post3.summary = "This is a summary of post THREEEE, its just a small amount of text that describes the post"
+post3.author = "Maia"
+post3.html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>"""
+db.create_post(post3)
