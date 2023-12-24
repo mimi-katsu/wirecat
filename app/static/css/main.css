@@ -69,12 +69,12 @@
 body {
     display: grid;
     grid-template-columns: 1fr 4fr 1fr;
-    grid-template-rows: 1fr 2em 12fr 1fr;
+    grid-template-rows: 3.25em 2em 2.65em 12fr 1fr;
 }
 
 .content {
     grid-column-start: 2;
-    grid-row-start: 3;
+    grid-row-start: 4;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 400px repeat(4, 155px);
@@ -89,8 +89,7 @@ body {
 .header {
     display: grid;
     overflow: hidden;
- 
-    grid-template-rows: 3.5em .5em;
+    grid-template-rows: 2.8em .5em;
     background-color: var(--background-color-main);
     grid-column-start: 1;
     grid-column-end: 4;
@@ -101,9 +100,9 @@ body {
     position: relative;
     top: 0;
     left: 0;
-    padding: 1em;
+    padding: .25em;
     max-width: 28em;
-    height: 5em;
+    height: 3.5em;
     
 }
 
@@ -130,7 +129,7 @@ body {
 .white-block {
     z-index: 1;
     position: relative;
-    left: 3.5em;
+    left: 2.75em;
     grid-row-start: 2;
     grid-column-start: 1;
     grid-column-end: 2;
@@ -163,6 +162,20 @@ body {
   text-decoration:none;
 }
 
+.nav {
+  background-color: var(--border-color-secondary);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-row-start:3;
+  grid-column-start: 1;
+  grid-column-end: 5;
+}
+.nav>a{
+  padding-left: 1em;
+  padding-right: 1em;
+  color: white;
+}
 .main-nav {
   display: flex;
   justify-content: end;
@@ -186,6 +199,7 @@ text-decoration:none;
 }
 .post img {
     height: 100px;
+    width: 100px;
 }
 
 .best-posts {
@@ -199,7 +213,7 @@ text-decoration:none;
   display: flex;
   align-items: center;
   flex-direction: column;
-  grid-row-start: 3;
+  grid-row-start: 4;
   grid-column-start: 1; 
 }
 
@@ -230,6 +244,6 @@ a {
 .footer {
     grid-column-start: 1;
     grid-column-end: 4;
-    grid-row-start: 4;
+    grid-row-start: 5;
     background-color: var(--background-color-secondary);
 }
