@@ -72,16 +72,26 @@ body {
 
 .content {
     grid-column-start: 2;
+    gap: 1em;
     grid-row-start: 4;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 400px repeat(4, 155px);
+    grid-auto-rows: minmax(4em, 6em);
+}
+
+.carousel-container {
+  grid-column-start: 1;
+  grid-column-end: 4;
+  overflow: scroll;
+  height: 400px;
+  width: auto;
+  background-color: var(--background-color-secondary);
 }
 
 .carousel {
-  height: 100%;
-  width: auto;
-  background-color: var(--background-color-secondary);
+  width: 1500px;
+  height: auto;
+  display: flex;
 }
 
 .header {
@@ -161,6 +171,7 @@ body {
 }
 
 .nav {
+  overflow: scroll;
   background-color: var(--border-color-secondary);
   display: flex;
   justify-content: center;
@@ -210,6 +221,7 @@ body {
     align-items: center;
     justify-content: center;
     display: flex;
+    grid-row-start: 3;
 }
 
 
