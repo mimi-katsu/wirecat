@@ -213,10 +213,7 @@ a {
 }
 
 .content {
-  grid-column-start: 2;
-  gap: 1em;
-  grid-row-start: 4;
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: minmax(4em, 6em);
+    grid-column-start: 2;
+    gap: 1em;
+    grid-row-start: 4;
 }
