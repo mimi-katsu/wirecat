@@ -1,0 +1,38 @@
+.content {
+    grid-column-start: 2;
+    gap: 1em;
+    grid-row-start: 4;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-auto-rows: minmax(4em, 6em);
+}
+
+.carousel-container {
+  grid-column-start: 1;
+  grid-column-end: 4;
+  overflow: scroll;
+  height: 400px;
+  width: auto;
+  background-color: var(--background-color-secondary);
+}
+
+.carousel {
+  width: 1500px;
+  height: auto;
+  display: flex;
+}
+
+.post {
+    display: flex;
+}
+.post img {
+    height: 100px;
+    width: 100px;
+}
+
+.best-posts {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    grid-row-start: 3;
+}

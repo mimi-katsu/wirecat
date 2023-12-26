@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import os
 from app import app
 from app.util.wirecat import WireCat
-from app.util.secrets import Secrets
+from app.util.w_secrets import Secrets
 
 wirecat = WireCat()
 wirecat.posts.update(wirecat.db.get_recent_posts())
@@ -58,3 +58,7 @@ def update_posts():
     else:
         wirecat.posts.update(wirecat.db.get_recent_posts())
         return 'posts updated', 200
+
+@app.errorhandler(404)
+def err404(e):
+    return render_template('404.html'), 404
