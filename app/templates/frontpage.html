@@ -5,14 +5,14 @@
 {% block content %}
 <link rel="stylesheet" href="/static/css/frontpage.css">
     <div class="carousel-container">
-    <div class="carousel">
-        {% for p in best_posts %}
-            <div class="post">
-                <p class="post-text">{{p.title}}</p>
-                <a href="/blog/{{p.id}}"><img src="{{p.thumbnail}}" alt="" class="post-image"></a>
-            </div>
-        {% endfor %}
-    </div>
+        <div class="carousel">
+            {% for p in best_posts %}
+                <div class="post">
+                    <p class="post-text">{{p.title}}</p>
+                    <a href="/blog/{{p.id}}"><img src="{{p.thumbnail}}" alt="" class="post-image"></a>
+                </div>
+            {% endfor %}
+        </div>
     </div>
     <div class="best-posts">
         <h2>Best Posts</h2>

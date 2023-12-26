@@ -17,11 +17,14 @@
 }
 
 .carousel {
-  width: 1500px;
+  width: auto;
   height: auto;
   display: flex;
 }
 
+.carousel>.post>img{
+  height: 400px;
+}
 .post {
     display: flex;
 }
@@ -34,5 +37,5 @@
     align-items: center;
     justify-content: center;
     display: flex;
-    grid-row-start: 3;
+    grid-row-start: 5;
 }
