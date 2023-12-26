@@ -9,3 +9,7 @@ body {
 img {
     width: 50vw;
 }
+
+p {
+    font-family: sans-serif;
+}
