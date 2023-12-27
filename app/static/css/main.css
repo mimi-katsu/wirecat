@@ -59,6 +59,10 @@
     isolation: isolate;
   }
 
+  * {
+    text-decoration: none;
+    font-family: sans-serif;
+  }
 
 body {
     display: grid;
@@ -88,21 +92,23 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: end;
-  margin: .25em;
+  align-items: center;
+  padding-right: .25em;
 }
 
 .main-nav>a{
-  padding: .25em;
+  padding-left: 1em;
 }
 
 .nav {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
+  background-color: darkgray;
 }
 
 .nav>a {
-  padding: 1em;
+  padding: .5em;
 }
 /*
 #search {
