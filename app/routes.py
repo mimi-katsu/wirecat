@@ -1,3 +1,9 @@
+"""
+Sections:
+    MAIN~
+    ERRORS~
+"""
+
 from flask import Flask, render_template, request
 import os
 from app import app
@@ -8,12 +14,19 @@ wirecat = WireCat()
 wirecat.posts.update(wirecat.db.get_recent_posts())
 s = Secrets()
 
+# ------------------------------------------------------------------------------
+#   MAIN~ - Routes for main pages
+#-------------------------------------------------------------------------------
+
+
 @app.route('/home')
 @app.route('/index')
 @app.route('/')
 def home():
+    
     best = wirecat.db.get_recent_posts()
-    return render_template('frontpage.html', best_posts=best)
+    latest  = best[0]
+    return render_template('frontpage.html', best_posts=best, latest_post=latest)
 
 @app.route('/downloads')
 def downloads():
@@ -22,12 +35,10 @@ def downloads():
 @app.route('/community')
 def community():
     return 'Community'
-if __name__ == '__main__':
-    app.run(debug=True)
 
 @app.route('/blog')
 def blog():
-    return 'BLog'
+    return 'Blog'
 
 @app.route('/blog/<post_id>')
 def blog_post(post_id):
@@ -59,6 +70,20 @@ def update_posts():
         wirecat.posts.update(wirecat.db.get_recent_posts())
         return 'posts updated', 200
 
+# ------------------------------------------------------------------------------
+#   API~ - Routes for api pages
+#-------------------------------------------------------------------------------
+
+
+
+# ------------------------------------------------------------------------------
+#   ERRORS~ - Routes for error pages
+#-------------------------------------------------------------------------------
+
 @app.errorhandler(404)
 def err404(e):
     return render_template('404.html'), 404
+
+
+if __name__ == '__main__':
+    app.run(debug=True)

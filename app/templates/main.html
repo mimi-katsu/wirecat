@@ -8,9 +8,18 @@
 </head>
 <body>
     <div class="header">
-        {% include 'header.html' %}
-    </div>
+        <div class="logo" id="header-logo">
+            <a href="/">
+                <img src="/static/images/wirecat-logo.png" alt="Wirecat Logo">
+            </a>
+        </div>
 
+        <div class="main-nav">
+                <a href="/home" class="header-nav">Home</a>
+                <a href="/community" class="header-nav">Community</a>
+                <a href="/downloads" class="header-nav">Downloads</a>        
+        </div>
+    </div>
     <div class="nav">
         <a href="/blog/collection/featured">Featured</a>
         <a href="/blog/collection/best">Best</a>
@@ -18,7 +27,12 @@
         <a href="/blog/collection/programming">Programming</a>
         <a href="/blog/collection/ctf">CTF's</a>
         <a href="/blog/collections">Collections</a>
+        <a href="/blog/collection/recent">Recent</a>
+        <a href="/blog/collection/programming">Programming</a>
+        <a href="/blog/collection/ctf">CTF's</a>
+        <a href="/blog/collections">Collections</a>
     </div>
+
     <div class="sidebar-left">
         {% include 'sidebar-left.html' %}
     </div>
