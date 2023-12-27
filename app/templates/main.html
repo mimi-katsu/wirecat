@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Welcome to WIRECAT{% endblock %}</title>
     <link rel="stylesheet" href="/static/css/main.css">
+    {% block css %}{% endblock %}
 </head>
 <body>
     <div class="header">
@@ -22,13 +23,6 @@
         </div>
     </div>
     {% block nav %}{% endblock %}
-
-    <div class="sidebar-left">
-        {% include 'sidebar-left.html' %}
-    </div>
-    <div class="sidebar-right">
-        {% include 'sidebar-right.html' %}
-    </div>
     <div class="content">
         {% block content %}{% endblock %}
     </div>

@@ -27,7 +27,7 @@ def home():
     
     best = wirecat.db.get_recent_posts()
     latest  = best[0]
-    return render_template('frontpage.html', best_posts=best, latest_post=latest)
+    return render_template('frontpage.html', best_posts=[best[0]], latest_post=latest)
 
 @app.route('/downloads')
 def downloads():
