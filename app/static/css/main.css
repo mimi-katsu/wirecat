@@ -1,12 +1,12 @@
 :root {
     --background-color-main: white;
-    --background-color-secondary: lightgray;
+    --background-color-secondary: white;
     --background-color-tertiary: white;
-    --border-color-main: gray ;
+    --border-color-main: white ;
     --border-color-secondary: black;
     --border-color-tertiary: black;
     --font-color-main: black;
-    --font-color-secondary: lightgray;
+    --font-color-secondary: white;
     --font-color-tertiary: black;
 
     font-family: sans-serif;
@@ -73,7 +73,7 @@ body {
 .header {
     display: flex;
     justify-content: space-between;
-    background-color: lightgray;
+    background-color: var(--background-color-main);
     /* background-color: var(--background-color-main); */
 
 }
@@ -103,7 +103,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  background-color: darkgray;
+  background-color: var(--background-color-secondary);
 }
 
 .nav>a {

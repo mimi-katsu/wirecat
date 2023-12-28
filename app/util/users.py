@@ -9,7 +9,7 @@ class User:
         self.favorites:list[str] = favorites
 
     def favorites(self):
-        """return a list of posts that the user has "favorited" on the blog""""
+        """return a list of posts that the user has "favorited" on the blog"""
         return
     def comments(self):
         """return list of comments that the user has left on blog posts"""

@@ -6,11 +6,13 @@
 }
 
 .carousel {
-  max-width: 1000px;
-  height: auto;
+  border-bottom-left-radius: .5em;
+  border-bottom-right-radius: .5em;
+  overflow: hidden;
 }
 
 .carousel>.post {
+  overflow: hidden;
   position: relative;
   top: 0;
   left: 0;
@@ -18,7 +20,6 @@
 
 .carousel .post .carousel-overlay p {
   color: white;
-  opacity: 1;
 }
 
 .carousel .post a {
@@ -26,15 +27,21 @@
   z-index: 0;
 }
 
+.carousel .post a img {
+  max-height: 60vh;
+  width: auto;
+}
+
 .carousel .post .carousel-overlay {
   z-index: 1;
   background-color: black;
-  opacity: 0.7; /* Corrected opacity value */
-  width: 100%; /* Cover the entire .post element */
-  height: auto; /* Cover the entire .post element */
+  opacity: 0.7;
+  width: 100%;
+  height: auto;
   position: absolute;
   bottom: 0;
   left: 0;
+  padding: 1em;
 }
 
 .best-posts {
@@ -50,4 +57,12 @@
 
 .latest-post {
   max-width: 90vw;
+}
+
+.carousel-overlay .black-overlay {
+  background-color: black;
+  position: relative;
+  top: 0;
+  left: 0;
+  height: auto;
 }
