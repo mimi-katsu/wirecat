@@ -1,17 +1,18 @@
 """
 All sections of this page are tagged with the following titles in order to be easily 
-searchable. MAIN~,API~, etc.
+searchable. MAIN~,API/AUTH~, etc.
 
 Sections:
     MAIN~
     API~
+        API/AUTH~
     ERRORS~
 
     love, 
         mimi
 """
 import os
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from app import app
 from app.util.wirecat import WireCat
 from app.util.w_secrets import Secrets
@@ -35,7 +36,7 @@ def home():
 
 @app.route('/downloads')
 def downloads():
-    return 'Downloads'
+    return render_template('downloads.html')
 
 @app.route('/forum')
 def community():
@@ -50,34 +51,15 @@ def blog_post(post_id):
     p = wirecat.posts.get_post(post_id)
     return render_template('post.html', post=p)
 
-# @app.route('/blog/add', methods=['POST', 'GET'])
-# def add_post():
-#     if request.headers.get('auth') != s.get_author_key():
-#         return 'Forbidden', 403
-#     elif request.method == 'POST' and request.headers.get('Content-Type') == 'application/json':
-#         return f"Post added\nDATA: {request.get_json()}"
-#     else:
-#         return 'Error: Post add failed', 404
 
-# @app.route('/blog/edit/<post_id>')
-# def edit_post():
-#     return f"Post {post_id} edited"
 
-# @app.route('/blog/delete/<post_id>')
-# def delete_post():
-#     return f"Post {post_id} deleted"
-
-# @app.route('/blog/update')
-# def update_posts():
-#     if request.headers.get('auth') != s.get_author_key():
-#         return 'Forbidden', 403
-#     else:
-#         wirecat.posts.update(wirecat.db.get_recent_posts())
-#         return 'posts updated', 200
 
 #-------------------------------------------------------------------------------------------------#
-#   API~ - Routes for api pages
+#   API~ Routes for api pages
 #-------------------------------------------------------------------------------------------------#
+
+
+
 
 @app.route('/api/v1')
 def v1_help():
@@ -85,19 +67,37 @@ def v1_help():
     #   return some json providing a top level overview of the api and how to use it
         return render_template('api-help.html')
 
+
+
+
+#-------------------------------------------------------------------------------------------------#
+#   ~API/AUTH~ Routes for api pages related to authorization of users
+#-------------------------------------------------------------------------------------------------#
+
+
 @app.route('/api/v1/auth/login')
 
 @app.route('/api/v1/auth/logout')
 
-@app.route('/api/v1/auth/verify')
+@app.route('/api/v1/auth/verify', methods = ['GET', 'POST'])
 def verify():
+    """verify requests made to the api with an api key or HMAC authentication"""
+    if request.method == 'GET':
+        return jsonify(verified=False)
+    
+    if request.method == 'post' and request.headers.get('auth'):
+        key = request.headers.get('auth')
+        state = s.verify_key(key)
+        return jsonify(verified=state)
+
     #TODO
-    #Verify requests that use api keys/HMAC and not a login system
+    #Verify requests that use HMAC and not an api key
     return 'Success', 200
+
 @app.route('/api/v1/posts')
 def posts():
     #TODO:
-    #   return json explaining how to auth and which child routers are available
+    #   return json explaining how to auth and which child routes are available
     return ('post-help.html'), 200
 @app.route('/api/v1/posts/add', methods=['GET','POST'])
 def add_post():
@@ -113,7 +113,7 @@ def add_post():
 
 @app.route('/api/v1/posts/delete', methods=['GET','POST'])
 
-@app.route('/api/v1/posts/update', methods=['GET','POST'])
+@app.route('/api/v1/posts/unpublish')
 
 @app.route('/api/v1/posts/edit')
 

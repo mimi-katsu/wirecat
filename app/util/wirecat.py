@@ -1,6 +1,11 @@
 import sqlite3
 import os
+from datetime import datetime
+import random
+import string
 from app.util.posts import Post, Posts
+from app.util.users import User, Users
+from app.util.w_secrets import Secrets
 
 class WireCat:
     def __init__(self):
@@ -12,7 +17,6 @@ class Database:
         # create connection to database
         connection = sqlite3.connect("./db/devdb.sqlite")
         cursor = connection.cursor()
-
         #set journal mode for persistence
         cursor.execute("""PRAGMA journal=WAL""")
         #create posts table
@@ -26,9 +30,26 @@ class Database:
             publish_date DATETIME NOT NULL,
             tags TEXT
         )""")
-        connection.commit()
 
+        cursor.execute("""CREATE TABLE IF NOT EXISTS users (
+            user_id TEXT PRIMARY KEY,
+            username TEXT NOT NULL,
+            first_name TEXT,
+            last_name TEXT,
+            email TEXT NOT NULL,
+            date_created NOT NULL,
+            favorites TEXT
+
+        )""")
+        connection.commit()
         return connection
+
+    def create_user(self, user:object):
+        conn = self.init_db()
+        cursor = conn.cursor()
+        cursor.execute("""INSTER INTO users (
+            user_id, username, first_name, last_name, email, date_created, favorites, api_key, secret_key, password VALUES (?,?,?,?,?,?,?,?,?,?)""",
+            (user.user_id, user.username, user.first_name, user.last_name, user.email, user.date_created, user.favorites, user.api_key, user.secret_key, user.password))
 
     def create_post(self, post:object):
         conn = self.init_db()
@@ -75,3 +96,14 @@ post3.summary = "This is a summary of post THREEEE, its just a small amount of t
 post3.author = "Maia"
 post3.html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>"""
 db.create_post(post3)
+
+s = Secrets()
+u = Users()
+user = User()
+user.username = 'mimi'
+user.email = 'mimi@wirecat.org'
+user.first_name = 'mimi'
+user.password = s.sha_256_hash('password123!')
+user.api_key, user.secret_key = s.new_api_key()
+
+print(user.username, user.api_key)
