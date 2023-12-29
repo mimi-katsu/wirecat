@@ -13,9 +13,9 @@ Sections:
 """
 import os
 from flask import Flask, render_template, request, jsonify
-from app import app
 from app.util.wirecat import WireCat
 from app.util.w_secrets import Secrets
+from app import app, jwt_required
 
 wirecat = WireCat()
 wirecat.posts.update(wirecat.db.get_recent_posts())
@@ -112,6 +112,10 @@ def add_post():
         return render_template('api_request_success.html'), 200
 
 @app.route('/api/v1/posts/delete', methods=['GET','POST'])
+@jwt_required()
+def delete():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
 
 @app.route('/api/v1/posts/unpublish')
 

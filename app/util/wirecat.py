@@ -50,6 +50,12 @@ class Database:
         cursor.execute("""INSTER INTO users (
             user_id, username, first_name, last_name, email, date_created, favorites, api_key, secret_key, password VALUES (?,?,?,?,?,?,?,?,?,?)""",
             (user.user_id, user.username, user.first_name, user.last_name, user.email, user.date_created, user.favorites, user.api_key, user.secret_key, user.password))
+    
+    def get_user(self, user_name):
+        conn = self.init_db()
+        cursor = conn.cursor()
+        cursor.execute(f""" SELECT * FROM users WHERE user_name ={user_name}""")
+        return cursor.fetchone()
 
     def create_post(self, post:object):
         conn = self.init_db()
