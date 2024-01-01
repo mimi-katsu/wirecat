@@ -3,9 +3,9 @@ import os
 from datetime import datetime
 import random
 import string
-from app.util.posts import Post, Posts
-from app.util.users import User, Users
-from app.util.w_secrets import Secrets
+from wirecat.util.posts import Post, Posts
+from wirecat.util.users import User, Users
+from wirecat.util.w_secrets import Secrets
 
 class WireCat:
     def __init__(self):
