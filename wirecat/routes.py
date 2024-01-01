@@ -12,7 +12,7 @@ Sections:
         mimi
 """
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect    
 from wirecat.util.catlib import WireCat
 from wirecat.util.w_secrets import Secrets
 from wirecat import app
@@ -29,7 +29,6 @@ s = Secrets()
 @app.route('/index')
 @app.route('/')
 def home():
-    
     best = wirecat.db.get_recent_posts()
     latest  = best[0]
     return render_template('frontpage.html', best_posts=[best[0]], latest_post=latest)
@@ -51,7 +50,9 @@ def blog_post(post_id):
     p = wirecat.posts.get_post(post_id)
     return render_template('post.html', post=p)
 
-
+@app.route('/login')
+def login():
+    return render_template('login.html')
 
 
 #-------------------------------------------------------------------------------------------------#
@@ -75,7 +76,12 @@ def v1_help():
 #-------------------------------------------------------------------------------------------------#
 
 
-@app.route('/api/v1/auth/login')
+@app.route('/api/v1/auth/login', methods=['GET', 'POST'])
+def login_api():
+    if request.method == 'POST':
+        return redirect('/')
+    else:
+        return redirect('/forum')
 
 @app.route('/api/v1/auth/logout')
 

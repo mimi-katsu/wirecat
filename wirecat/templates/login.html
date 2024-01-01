@@ -1,0 +1,19 @@
+{% extends 'main.html' %}
+
+{% block title %}
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/login.html">
+{% endblock %}
+
+{% block content %}
+<form action="api/v1/auth/login" method="POST">
+    <label for="username-box">Username</label>
+    <input type="text" id="username-box" name="username" required>
+    <label for="password-box">Password</label>
+    <input type="password" name="password" id="password-box" required>
+    <button type="submit">Submit</button>
+</form>
+
+{% endblock %}
