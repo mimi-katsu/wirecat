@@ -12,13 +12,16 @@ Sections:
         mimi
 """
 import os
-from flask import Flask, render_template, request, jsonify, redirect    
-from wirecat.util.catlib import WireCat
-from wirecat.util.w_secrets import Secrets
-from wirecat import app
+from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql import func
 
-wirecat = WireCat()
-wirecat.posts.update(wirecat.db.get_recent_posts())
+# from wirecat.util.catlib import WireCat
+from wirecat.util.w_secrets import Secrets
+from wirecat.app import app
+
+# wirecat = WireCat()
+# wirecat.posts.update(wirecat.db.get_recent_posts())
 s = Secrets()
 
 #-------------------------------------------------------------------------------------------------#
@@ -29,10 +32,10 @@ s = Secrets()
 @app.route('/index')
 @app.route('/')
 def home():
-    best = wirecat.db.get_recent_posts()
-    latest  = best[0]
-    return render_template('frontpage.html', best_posts=[best[0]], latest_post=latest)
-
+    # best = wirecat.db.get_recent_posts()
+    # latest  = best[0]
+    # return render_template('frontpage.html', best_posts=[best[0]], latest_post=latest)
+    return render_template('frontpage.html')
 @app.route('/downloads')
 def downloads():
     return render_template('downloads.html')
@@ -47,7 +50,7 @@ def blog():
 
 @app.route('/blog/<post_id>')
 def blog_post(post_id):
-    p = wirecat.posts.get_post(post_id)
+    # p = wirecat.posts.get_post(post_id)
     return render_template('post.html', post=p)
 
 @app.route('/login')
@@ -133,7 +136,7 @@ def update_posts():
     if request.headers.get('auth') != s.get_author_key():
         return 'Forbidden', 403
     else:
-        wirecat.posts.update(wirecat.db.get_recent_posts())
+        # wirecat.posts.update(wirecat.db.get_recent_posts())
         return 'posts updated', 200
 
 @app.route('/api/v1/posts/highlight')

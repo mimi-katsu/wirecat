@@ -1,38 +1,45 @@
-import sqlite3
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import Integer, String
 
-import click
-from flask import current_app, g
+class Base(DeclarativeBase):
+  pass
 
-def init_app(app):
-    app.teardown_appcontext(close_db)
-    app.cli.add_command(init_db_command)
+db = SQLAlchemy(model_class=Base)
 
-def init_db():
-    db = get_db()
+class Post(db.Model):
+    post_id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    title:Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    author:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    html_content:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    summary:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    thumbnail:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    publish_date:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    tags:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    def __repr__(self):
+        return f"{self.title}"
 
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+class User(db.Model):
+    user_id:Mapped[int] = db.Column(db.Integer, primary_key=True)
+    username:Mapped[str] = db.Column(db.String, unique=False, nullable=False)
+    first_name:Mapped[str] = db.Column(db.String, unique=False, nullable=True)
+    last_name:Mapped[str] = db.Column(db.String, unique=False, nullable=True)
+    email:Mapped[str] = db.Column(db.String, unique=False, nullable=False)
+    api_key:Mapped[str] = db.Column(db.String, unique=True, nullable=True)
+    secret_key:Mapped[str] = db.Column(db.String, unique=False, nullable=True)
+    password:Mapped[str] = db.Column(db.String, unique=False, nullable=False)
+    def __repr__(self):
+        return f"{self.username}"
 
+class UserMeta(db.Model):
+    user_id:Mapped[int] = db.Column(db.Integer, primary_key=True)
+    username:Mapped[str] = db.Column(db.String, unique=True, nullable=False)
+    def __repr__(self):
+        return f"{self.username}"
 
-@click.command('init-db')
-def init_db_command():
-    """Clear the existing data and create new tables."""
-    init_db()
-    click.echo('Initialized the database.')
-
-def get_db():
-    if 'db' not in g:
-        g.db = sqlite3.connect(
-            current_app.config['DATABASE'],
-            detect_types=sqlite3.PARSE_DECLTYPES
-        )
-        g.db.row_factory = sqlite3.Row
-
-    return g.db
-
-
-def close_db(e=None):
-    db = g.pop('db', None)
-
-    if db is not None:
-        db.close()
+class PostMeta(db.Model):
+    post_id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    title:Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    def __repr__(self):
+        return f"{self.title}"
