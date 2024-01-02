@@ -21,7 +21,7 @@
     <div class="carousel">
         {% for p in best_posts %}
             <div class="post">
-                <a href="/blog/{{p.id}}"><img src="{{p.thumbnail}}" alt="" class="thumbnail"></a>
+                <a href="/blog/{{p.post_id}}"><img src="{{p.thumbnail}}" alt="" class="thumbnail"></a>
                 <div class="carousel-overlay">
                     <p class="post-title">{{p.title}}</p>
                     <p class="post-summary">{{p.summary}}</p>

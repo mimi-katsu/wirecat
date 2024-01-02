@@ -12,48 +12,46 @@ Sections:
         mimi
 """
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
-
-# from wirecat.util.catlib import WireCat
+from db import User, Post, UserMeta, PostMeta
 from wirecat.util.w_secrets import Secrets
-from wirecat.app import app
-
-# wirecat = WireCat()
-# wirecat.posts.update(wirecat.db.get_recent_posts())
 s = Secrets()
 
+wc = Blueprint('wirecat', __name__)
 #-------------------------------------------------------------------------------------------------#
 #   MAIN~ - Routes for main pages
 #-------------------------------------------------------------------------------------------------#
 
-@app.route('/home')
-@app.route('/index')
-@app.route('/')
+@wc.route('/home')
+@wc.route('/index')
+@wc.route('/')
 def home():
-    # best = wirecat.db.get_recent_posts()
-    # latest  = best[0]
-    # return render_template('frontpage.html', best_posts=[best[0]], latest_post=latest)
-    return render_template('frontpage.html')
-@app.route('/downloads')
+    post_id = 1
+    best = Post.query.all()
+    if not best[0].thumbnail:
+        best[0].thumbnail = '/static/images/default-thumb.png'
+    return render_template('frontpage.html', best_posts=[best[0]])
+    # return render_template('frontpage.html')
+@wc.route('/downloads')
 def downloads():
     return render_template('downloads.html')
 
-@app.route('/forum')
+@wc.route('/forum')
 def community():
     return render_template('forum.html')
 
-@app.route('/blog')
+@wc.route('/blog')
 def blog():
     return 'Blog'
 
-@app.route('/blog/<post_id>')
+@wc.route('/blog/<post_id>')
 def blog_post(post_id):
-    # p = wirecat.posts.get_post(post_id)
+    p = Post.query.get(post_id)
     return render_template('post.html', post=p)
 
-@app.route('/login')
+@wc.route('/login')
 def login():
     return render_template('login.html')
 
@@ -65,7 +63,7 @@ def login():
 
 
 
-@app.route('/api/v1')
+@wc.route('/api/v1')
 def v1_help():
     #TODO
     #   return some json providing a top level overview of the api and how to use it
@@ -79,16 +77,16 @@ def v1_help():
 #-------------------------------------------------------------------------------------------------#
 
 
-@app.route('/api/v1/auth/login', methods=['GET', 'POST'])
+@wc.route('/api/v1/auth/login', methods=['GET', 'POST'])
 def login_api():
     if request.method == 'POST':
         return redirect('/')
     else:
         return redirect('/forum')
 
-@app.route('/api/v1/auth/logout')
+@wc.route('/api/v1/auth/logout')
 
-@app.route('/api/v1/auth/verify', methods = ['GET', 'POST'])
+@wc.route('/api/v1/auth/verify', methods = ['GET', 'POST'])
 def verify():
     """verify requests made to the api with an api key or HMAC authentication"""
     if request.method == 'GET':
@@ -103,12 +101,12 @@ def verify():
     #Verify requests that use HMAC and not an api key
     return 'Success', 200
 
-@app.route('/api/v1/posts')
+@wc.route('/api/v1/posts')
 def posts():
     #TODO:
     #   return json explaining how to auth and which child routes are available
     return ('post-help.html'), 200
-@app.route('/api/v1/posts/add', methods=['GET','POST'])
+@wc.route('/api/v1/posts/add', methods=['GET','POST'])
 def add_post():
     if request.method == 'GET':
         return render_template(api-help.html), 200
@@ -120,16 +118,16 @@ def add_post():
         #   update posts if published
         return render_template('api_request_success.html'), 200
 
-@app.route('/api/v1/posts/delete', methods=['GET','POST'])
+@wc.route('/api/v1/posts/delete', methods=['GET','POST'])
 def delete():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
-@app.route('/api/v1/posts/unpublish')
+@wc.route('/api/v1/posts/unpublish')
 
-@app.route('/api/v1/posts/edit')
+@wc.route('/api/v1/posts/edit')
 
-@app.route('/api/v1/posts/update')
+@wc.route('/api/v1/posts/update')
 def update_posts():
     """Update posts held in memory. This will initiate the pulling of content from the 
     data base and refreshing of the content lists that are held in memory"""
@@ -139,17 +137,17 @@ def update_posts():
         # wirecat.posts.update(wirecat.db.get_recent_posts())
         return 'posts updated', 200
 
-@app.route('/api/v1/posts/highlight')
+@wc.route('/api/v1/posts/highlight')
 
-@app.route('/api/v1/posts/highlight/add')
+@wc.route('/api/v1/posts/highlight/add')
 
-@app.route('/api/v1/posts/highlight/remove')
+@wc.route('/api/v1/posts/highlight/remove')
 
 #-------------------------------------------------------------------------------------------------#
 #   ERRORS~ - Routes for error pages
 #-------------------------------------------------------------------------------------------------#
 
-@app.errorhandler(404)
+@wc.errorhandler(404)
 def err404(e):
     return render_template('404.html'), 404
 
