@@ -124,7 +124,7 @@ body {
   display: flex;
   grid-row-start: 3;
   align-items: start;
-  padding: 2em;
+  padding: 1em;
   justify-content: center;
   width: 100vw;
 }

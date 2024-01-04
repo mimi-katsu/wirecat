@@ -17,7 +17,7 @@
     width: 100%;
 }
 
-.sidebar {
+/* .sidebar {
     display: flex;
     flex-wrap: wrap;
 }
@@ -27,7 +27,7 @@
     margin-left: .5em;
     margin-bottom: .5em;
     width: 100px;
-}
+} */
 
 .post-buttons>* {
     margin: 1em;
