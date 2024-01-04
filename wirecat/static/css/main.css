@@ -1,12 +1,12 @@
 :root {
     --background-color-main: black;
     --background-color-secondary: rgb(13, 13, 13);
-    --background-color-tertiary: white;
+    --background-color-tertiary: lightgray;
     --border-color-main: white ;
     --border-color-secondary: black;
     --border-color-tertiary: rgb(28, 28, 28);
     --font-color-main: lightgray;
-    --font-color-secondary: white;
+    --font-color-secondary: rgb(28, 28, 28);
     --font-color-tertiary: black;
 
     font-family: sans-serif;
@@ -133,6 +133,6 @@ body {
   overflow: hidden;
   border: 1px solid var(--border-color-tertiary);
   border-radius: 8px;
-  padding: 2em;
+  padding: 1em;
   background-color: var(--background-color-secondary);
 }
