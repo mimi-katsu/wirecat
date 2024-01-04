@@ -11,11 +11,7 @@ def create_app(test_config=None):
     app.config['SQLALCHEMY_DATABASE_URI'] =\
             'sqlite:///' + os.path.join(app.instance_path, 'cat.sqlite')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    @app.errorhandler(404)
-    def page_not_found(e):
-        # Note that we set the 404 status explicitly
-        return render_template('404.html'), 404
-
+    
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
@@ -74,8 +70,21 @@ def create_app(test_config=None):
         # db.session.add(post3)
         # db.session.commit()
 
+    # Set custom 404 template
+    @app.errorhandler(404)
+    def page_not_found(e):
+        # Note that we set the 404 status explicitly
+        return render_template('404.html'), 404
+
+    # register main routes blueprint
     from .routes import wc
     app.register_blueprint(wc)
+    #register api blueprint
+    from .api import wc_api
+    app.register_blueprint(wc_api)
+    #register auth blueprint
+    from .auth import wc_auth
+    app.register_blueprint(wc_auth)
 
     return app
 
