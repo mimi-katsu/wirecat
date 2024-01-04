@@ -30,8 +30,9 @@ wc = Blueprint('wirecat', __name__)
 def home():
     post_id = 1
     best = Post.query.all()
-    if not best[0].thumbnail:
-        best[0].thumbnail = '/static/images/default-thumb.png'
+    for b in best:
+        if not b.thumbnail:
+            b.thumbnail = '/static/images/default-thumb.png'
     return render_template('frontpage.html', best_posts=[best[0]])
     # return render_template('frontpage.html')
 @wc.route('/downloads')
