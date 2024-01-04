@@ -18,30 +18,20 @@
 {% endblock %}
 
 {% block content %}
-    <div class="carousel">
-        {% for p in best_posts %}
+{% for p in best_posts %}
+<a href="/blog/{{p.post_id}}">
+    <div class="carousel card">
             <div class="post">
-                <a href="/blog/{{p.post_id}}"><img src="{{p.thumbnail}}" alt="" class="thumbnail"></a>
+                <img src="{{p.thumbnail}}" alt="" class="thumbnail">
                 <div class="carousel-overlay">
                     <p class="post-title">{{p.title}}</p>
                     <p class="post-summary">{{p.summary}}</p>
                     <div class="black-overlay"></div>
                 </div>
             </div>
-        {% endfor %}
     </div>
+</a>
+{% endfor %}
 
-    <div class="latest-post">
-    </div>
-
-    <div class="best-posts">
-        <h2>Best Posts</h2>
-        {% for p in best_posts %}
-            <div class="post">
-                <p class="post-text">{{p.title}}</p>
-                <a href="/blog/{{p.id}}"><img src="{{p.thumbnail}}" alt="" class="post-image"></a>
-            </div>
-        {% endfor %}
-    </div>
 
 {% endblock %}

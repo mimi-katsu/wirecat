@@ -1,0 +1,28 @@
+.content {
+    flex-wrap: wrap;
+}
+
+.post {
+    display: flex;
+    align-items: start;
+    flex-direction: column;
+    min-width: 200px;
+}
+.post-head {
+    padding-bottom: 2em;
+    margin-bottom: 2em;
+    border-bottom: 1px solid var(--border-color-tertiary);
+    width: 100%;
+}
+
+.sidebar {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.sidebar .post {
+    padding: .5em;
+    margin-left: .5em;
+    margin-bottom: .5em;
+    width: 100px;
+}
