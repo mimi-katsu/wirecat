@@ -1,5 +1,6 @@
 import os
 from flask import Flask, render_template
+from flask_jwt_extended import JWTManager
 from db import db, User, Post, UserMeta, PostMeta
 
 def create_app(test_config=None):
@@ -8,6 +9,9 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY='dev'
     )
+    app.config['JWT_SECRET_KEY'] = 'dev'
+    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+
     app.config['SQLALCHEMY_DATABASE_URI'] =\
             'sqlite:///' + os.path.join(app.instance_path, 'cat.sqlite')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -85,7 +89,7 @@ def create_app(test_config=None):
     #register auth blueprint
     from .auth import wc_auth
     app.register_blueprint(wc_auth)
-
+    jwt = JWTManager(app)
     return app
 
 app = create_app()
