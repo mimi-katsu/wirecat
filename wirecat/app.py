@@ -1,20 +1,22 @@
 import os
+
 from flask import Flask, render_template
 from flask_jwt_extended import JWTManager
 from db import db, User, Post, UserMeta, PostMeta
+from config import Config, DevEnv, ProdEnv, Uploads
+
+UPLOAD_FOLDER = '/static'
+ALLOWED_EXTENSIONS = {'txt','png', 'jpg', 'jpeg', 'gif', 'md'}
 
 def create_app(test_config=None):
     # create and configure the app
     app = Flask(__name__, instance_relative_config=True)
-    app.config.from_mapping(
-        SECRET_KEY='dev'
-    )
-    app.config['JWT_SECRET_KEY'] = 'dev'
-    app.config['JWT_TOKEN_LOCATION'] = ['cookies']
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+    app.config.from_object(DevEnv())
+    app.config.from_object(Config())
+    app.config.from_object(Uploads())
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'cat.sqlite')
 
-    app.config['SQLALCHEMY_DATABASE_URI'] =\
-            'sqlite:///' + os.path.join(app.instance_path, 'cat.sqlite')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     if test_config is None:
         # load the instance config, if it exists, when not testing

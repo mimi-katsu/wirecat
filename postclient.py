@@ -57,9 +57,21 @@ with open(f'{path}') as f:
         'title': soup.title.text,
         'html_content': soup.content.text,
         'summary': soup.summary.text,
-        'thumbnail': soup.thumbnail.text,
         'tags': soup.tags.text
         }
 
-    print(post_json)
-    
+    pics = soup.find_all('pic')
+    pics.append(soup.thumbnail)
+    i=0
+    post_files = {}
+    for p in pics:
+        try:
+            i+=1
+            pic = open(f'{p.text}', 'rb')
+            post_files[f'file{i}'] = pic
+
+        except FileNotFoundError:
+            print('Missing an image file, aborting.')
+            exit()
+    response = requests.post('http://127.0.0.1:5001/api/v1/posts/add', data=post_json, files=post_files)
+    print(response.text)
