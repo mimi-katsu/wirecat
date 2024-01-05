@@ -31,7 +31,7 @@ class User(db.Model):
     password:Mapped[str] = db.Column(db.String, unique=False, nullable=False)
     def __repr__(self):
         return f"{self.username}"
-
+    
 class UserMeta(db.Model):
     user_id:Mapped[int] = db.Column(db.Integer, primary_key=True)
     username:Mapped[str] = db.Column(db.String, unique=True, nullable=False)
@@ -40,6 +40,20 @@ class UserMeta(db.Model):
 
 class PostMeta(db.Model):
     post_id:Mapped[int] = mapped_column(Integer, primary_key=True)
-    title:Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    views:Mapped[str] = db.Column(db.Integer, unique=False, nullable=False)
+    updoots:Mapped[str] = db.Column(db.Integer, unique=False, nullable=False)
+
     def __repr__(self):
         return f"{self.title}"
+
+class Author(db.Model):
+    user_id:Mapped[str] = mapped_column(String, primary_key=True)
+    username:Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    photo_path:Mapped[str] = mapped_column(String, unique=True, nullable=True)
+    first_name:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    last_name:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    experience:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    about:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    posts:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    def __repr__(self):
+        return f'{self.username}'

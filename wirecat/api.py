@@ -1,4 +1,5 @@
 import os
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
