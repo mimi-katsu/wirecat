@@ -1,19 +1,19 @@
 import os
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
-from db import User, Post, UserMeta, PostMeta
-from wirecat.util.w_secrets import Secrets
-from werkzeug.utils import secure_filename
 import random
 import string
+import json
+from datetime import datetime
+from flask_sqlalchemy import SQLAlchemy
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint
+from werkzeug.utils import secure_filename
+from werkzeug.security import check_password_hash, generate_password_hash
+from bs4 import BeautifulSoup
+from db import User, Post, PostMeta
+from wirecat.util.catlib import catlib
+from wirecat.app import db
+
 wc_api = Blueprint('api', __name__)
-def generate_id(length=12):
-    '''create an alphanumeric post id if it doesn't exist already'''
-    characters = string.ascii_letters + string.digits 
-    random_id = ''.join(random.choice(characters) for _ in range(length))
-    return random_id
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'txt','png', 'jpg', 'jpeg', 'gif', 'md'}
@@ -27,27 +27,53 @@ def v1_help():
     #   return some json providing a top level overview of the api and how to use it
         return render_template('api-help.html')
 
-@wc_api.route('/api/v1/posts')
-def posts():
+@wc_api.route('/api/v1/posts/get')
+def get_posts():
+    posts = Post.query.all()
+    for p in posts:
+        print(p.title, p.summary, p.author)
     #TODO:
     #   return json explaining how to auth and which child routes are available
-    return ('post-help.html'), 200
+    return redirect(url_for('wirecat.home')), 200
 @wc_api.route('/api/v1/posts/add', methods=['GET','POST'])
 def add_post():
     if request.method == 'GET':
-        return render_template(api-help.html), 200
+        return redirect(url_for('wirecat.login')), 200
     if request.method == 'POST':
-        print(request.files)
-        for f in request.files:
-            file = request.files[f'{f}']
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                print(filename)
-                file.save(f'wirecat/static/images/{generate_id()}-{filename}')
-            else:
-                return jsonify(error='Invalid upload')
-        return jsonify(upload='success'), 200
-
+        key = request.form.get('key')
+        api_user = request.form.get('username')
+        user = User.query.filter_by(username=api_user).first()
+        if user is None:
+            return jsonify(error='Invalid Login')
+        valid = check_password_hash(user.api_key, key)
+        if valid:
+            # initialize some useful values
+            now = datetime.now()
+            post_id = catlib.generate_id()
+            # Create SQLAlchemy object and push it to the database
+            post = Post(
+                title=request.form.get('title', None),
+                author=user.username,
+                html_content=request.form.get('html_content', None),
+                summary=request.form.get('summary', None),
+                thumbnail=request.form.get('thumbnail', None),
+                tags=request.form.get('tags', None),
+                publish_date=f'{now.year}/{now.month}/{now.day}'
+                )
+            db.session.add(post)
+            db.session.commit()
+            # Save the included files in a directory sturcture based on the date (YYYY/MM/DD)
+            for f in request.files:
+                file = request.files[f'{f}']
+                if file and catlib.verify_post(request):
+                    filename = secure_filename(file.filename)
+                    path = catlib.make_current_dir_posts()
+                    file.save(f'{path}/{filename}')
+                else:
+                    return jsonify(upload_type='post', success=False, msg='There was a problem uploading your post')
+            return jsonify(upload_type='post', success=True, msg='Post was successfully uploaded'), 200
+        else:
+            return jsonify(error='Invalid Login')
 @wc_api.route('/api/v1/posts/delete', methods=['GET','POST'])
 def delete():
     current_user = get_jwt_identity()

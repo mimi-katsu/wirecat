@@ -1,9 +1,20 @@
-<title><!-- Title of the post--></title>
+<!-- Title of the post-->
+<title>Post 123123</title>
 
-<thumbnail><!--Path to the thumbnail pic--></thumbnail>
+<!--Path to the thumbnail pic-->
+<thumbnail>./post1.jpg</thumbnail>
 
-<summary><!--Summary of the main content of the post. should be two sentences MAX!--></summary>
+<!--Summary of the main content of the post. should be two sentences MAX!-->
+<summary>
+    Summary of post 1
+</summary>
 
-<content><!--Main content of the post--><pic><!--Pics should contain their file path just like the thumbnail --></pic></content>
+<!--Main content of the post. Pics should contain their file path just like the thumbnail -->
+<content>
+    <p>This is the main html comment of the post</p>
+    <pic>./post1.jpg</pic>
+    <p>This is a second paragraph</p>
+</content>
 
-<tags><!-- Tags for the post. Should be comma seperated values or a python formatted list--></tags>
+<!-- Tags for the post. Should be comma seperated values or a python formatted list-->
+<tags>tag1</tags>

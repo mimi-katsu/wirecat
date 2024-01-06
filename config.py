@@ -4,6 +4,7 @@ class Config(object):
     JWT_TOKEN_LOCATION = ['cookies']
 
 class DevEnv:
+    SECRET_KEY = 'dev'
     JWT_SECRET_KEY = 'dev'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 

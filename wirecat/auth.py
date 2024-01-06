@@ -1,5 +1,6 @@
 import functools
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, set_access_cookies
+import secrets
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, get_csrf_token, set_access_cookies
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for, jsonify, make_response
 )
@@ -33,8 +34,7 @@ def login_api():
         else:
             return redirect(url_for('wirecat.login'))
         # hash provided password and compare
-        recv_hash = generate_password_hash(password)
-        valid = check_password_hash(generate_password_hash(user.password), password)
+        valid = check_password_hash(user.password, password)
 
         if valid:
             # check for request_type filed in form. If it exists, a json response is built. If not, a redirection response to /home is built and the token
@@ -42,7 +42,7 @@ def login_api():
             if req_type == 'json':
                 expiry = datetime.timedelta(minutes=1)
                 token = create_access_token(identity=username, expires_delta=expiry)
-                response = jsonify(logged_in=True, token=token)
+                response = jsonify(logged_in=True, access_token_cookie=token, csrf_access_token = get_csrf_token(encoded_token=token))
                 return response
             else:
                 expiry = datetime.timedelta(hours=12)

@@ -1,10 +1,11 @@
 import os
-
+from werkzeug.security import generate_password_hash
 from flask import Flask, render_template
 from flask_jwt_extended import JWTManager
-from db import db, User, Post, UserMeta, PostMeta
+from db import db, User, Post
 from config import Config, DevEnv, ProdEnv, Uploads
-
+import secrets
+from wirecat.util.catlib import catlib
 UPLOAD_FOLDER = '/static'
 ALLOWED_EXTENSIONS = {'txt','png', 'jpg', 'jpeg', 'gif', 'md'}
 
@@ -35,21 +36,12 @@ def create_app(test_config=None):
 
     with app.app_context():
         db.create_all()
-        # user1 = User(username='maia1', email = 'test1@test.com', password = '123123')
-        # user2 = User(username='maia2', email = 'test2@test.com', password = '123123')
-        # user3 = User(username='maia3', email = 'test3@test.com', password = '123123')
-        # db.session.add(user1)
-        # db.session.add(user2)
-        # db.session.add(user3)
+        # key = secrets.token_hex(32)
+        # print(key)
+        # user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', password = generate_password_hash('123123'), api_key=generate_password_hash(key))
+        # db.session.add(user)
         # db.session.commit()
-        # u = db.session.execute(db.select(user2.user_id))
-        # print(u)
-        # print(User.query.all())
-        # # print(u.username)
-        # # User.query.filter_by(username = user1.username) 
-        # print('1')
-        # print(User.query.get(user2.user_id))
-        # print('1')
+        # u = db.session.execute(db.select(user.user_id))
         # post1 = Post(
         # title = "Post 1",
         # summary = "This is a summary of post ONE, its just a small amount of text that describes the post",

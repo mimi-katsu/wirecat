@@ -15,7 +15,7 @@ import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
-from db import User, Post, UserMeta, PostMeta
+from db import User, Post, PostMeta
 from wirecat.util.w_secrets import Secrets
 s = Secrets()
 

@@ -3,15 +3,31 @@ import os
 from datetime import datetime
 import random
 import string
-from wirecat.util.posts import Post, Posts
-from wirecat.util.users import User, Users
-from wirecat.util.w_secrets import Secrets
+import secrets
 
-# class catlib:
-#     def __init__(self):
-        # self.db = Database()
-        # self.posts = Posts()
+class catlib:
 
+        def generate_api_key():
+                return secrets.token_hex(32)
+
+        def generate_id(length=12):
+                '''create an alphanumeric post id if it doesn't exist already'''
+                characters = string.ascii_letters + string.digits 
+                random_id = ''.join(random.choice(characters) for _ in range(length))
+                return random_id
+
+        def make_current_dir_posts():
+                now = datetime.now()
+                path = os.path.join(f'{os.getcwd()}/wirecat/static/posts/{str(now.year)}/{str(now.month)}/{str(now.day)}')
+                os.makedirs(path, exist_ok=True)
+                if os.path.exists(path):
+                        return path
+                else:
+                        return None
+        def verify_post(post_request):
+                #TODO
+                #Implement logic for verifying post contents, sanitizing file paths, etc.
+                return True
 # class Database:
 #     def init_db(self):
 #         # create connection to database
@@ -113,3 +129,5 @@ from wirecat.util.w_secrets import Secrets
 # user.api_key, user.secret_key = s.new_api_key()
 
 # print(user.username, user.api_key)
+
+catlib.make_current_dir_posts()
