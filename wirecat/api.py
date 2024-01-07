@@ -24,6 +24,10 @@ class InvalidCredentials(Exception):
     def __str__(self):
         return "Invalid Login"
 
+class DoesNotExist(Exception):
+    def __str__(self):
+        return f'This object does not exist'
+
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'txt','png', 'jpg', 'jpeg', 'gif', 'md'}
     return '.' in filename and \
@@ -51,6 +55,7 @@ def add_post():
 
     if request.method == 'POST':
         try:
+            response = None
             key = request.form.get('key', None)
             api_user = request.form.get('username', None)
             
@@ -97,26 +102,70 @@ def add_post():
                 for f in request.files:
                     file = request.files[f]
                     if file:
-                        filename = secure_filename(file.name)
+                        filename = secure_filename(file.filename)
                         # create the directory paths if needed and return the absolute path
                         path = catlib.make_current_dir_posts()
                         file.save(f'{path}/{filename}')
                 
-            response = jsonify(upload_type='post', success=True, msg='Post was successfully uploaded'), 200
+            response = jsonify(type='post', success=True, msg='Post was successfully uploaded'), 200
         
         except IntegrityError as e:
-            response = jsonify(upload_type='post', success=False, msg=f'{str(e.orig)}'), 200
+            response = jsonify(type='post', success=False, msg=f'{str(e.orig)}'), 200
         
         except InvalidPost as e:
-            response = jsonify(upload_type='post', success=False, msg=f'{e}'), 200
+            response = jsonify(type='post', success=False, msg=f'{e}'), 200
         
+        except InvalidCredentials as e:
+            response = jsonify(type='post', success=False, msg=f'{e}'), 200
+
         finally:
+            if not response:
+                response = jsonify(error='Something Unexpected occured')
             return response
 
-@wc_api.route('/api/v1/posts/delete', methods=['GET','POST'])
-def delete():
-    current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
+@wc_api.route('/api/v1/posts/delete/<post_id>', methods=['GET','POST'])
+def delete(post_id):
+    if request.method == 'GET':
+        return jsonify(error="Invalid method"), 200
+
+    if request.method == 'POST':
+        try:
+            response = None
+            key = request.form.get('key', None)
+            api_user = request.form.get('username', None)
+            
+            if not api_user and key:
+                raise InvalidCredentials
+
+            if key and api_user:
+                user = User.query.filter_by(username=api_user).first()
+
+            if not user and user.api_key:
+                raise InvalidCredentials
+            # match password hashes
+            valid = check_password_hash(user.api_key, key)
+
+            if not valid:
+                raise InvalidCredentials
+
+            if valid:
+                post = Post.query.get(post_id)
+                # if not post:
+                #     raise DoesNotExist
+                db.session.delete(post)
+                db.session.commit()
+
+                response = jsonify(type='delete', success=True, msg='Post was successfully deleted'), 200
+
+        except InvalidCredentials as e:
+            response = jsonify(type='delete', success=False, msg=f'{e}'), 200
+
+        except DoesNotExist as e:
+            repsonse = jsonify(type='delete', success=False, msg=f'{e}'), 200
+        finally:
+            if not response:
+                response = jsonify(error="Something unexpected happened")
+            return response
 
 @wc_api.route('/api/v1/posts/unpublish')
 
