@@ -45,9 +45,9 @@ with open(f'{path}') as f:
                 print('Missing an image file, aborting.')
                 exit()
     response = requests.post('http://127.0.0.1:5001/api/v1/posts/add', data=data, files = post_files)
-    
+    print('Server response:\n\n')    
     print(response.text)
-    print('Server response:\n')
+
 
 
 

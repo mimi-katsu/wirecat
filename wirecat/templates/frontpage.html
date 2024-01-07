@@ -33,5 +33,18 @@
 </a>
 {% endfor %}
 
-
+{% for a in all_posts %}
+<a href="/blog/{{a.post_id}}">
+    <div class="carousel card">
+            <div class="post">
+                <img src="{{a.thumbnail}}" alt="" class="thumbnail">
+                <div class="carousel-overlay">
+                    <p class="post-title">{{a.title}}</p>
+                    <p class="post-summary">{{a.summary}}</p>
+                    <div class="black-overlay"></div>
+                </div>
+            </div>
+    </div>
+</a>
+{% endfor %}
 {% endblock %}

@@ -38,7 +38,8 @@ def create_app(test_config=None):
         db.create_all()
         # key = secrets.token_hex(32)
         # print(key)
-        # user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', password = generate_password_hash('123123'), api_key=generate_password_hash(key))
+        # hash method should = pbkdf2:sha256, remove if it doesnt work
+        # user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', password = generate_password_hash('123123', method='pbkdf2:sha256'), api_key=generate_password_hash(key, method='pbkdf2:sha256'))
         # db.session.add(user)
         # db.session.commit()
         # u = db.session.execute(db.select(user.user_id))

@@ -33,7 +33,7 @@ def home():
     for b in best:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
-    return render_template('frontpage.html', best_posts=[best[0]])
+    return render_template('frontpage.html', best_posts=[best[0]], all_posts = best)
     # return render_template('frontpage.html')
 @wc.route('/downloads')
 def downloads():
