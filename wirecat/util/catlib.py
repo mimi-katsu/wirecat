@@ -16,7 +16,11 @@ class catlib:
                 random_id = ''.join(random.choice(characters) for _ in range(length))
                 return random_id
 
-        def make_current_dir_posts():
+        def html_image_path():
+                now = datetime.now()
+                return f'/static/posts/{str(now.year)}/{str(now.month)}/{str(now.day)}'
+
+        def file_save_path():
                 now = datetime.now()
                 path = os.path.join(f'{os.getcwd()}/wirecat/static/posts/{str(now.year)}/{str(now.month)}/{str(now.day)}')
                 os.makedirs(path, exist_ok=True)
@@ -24,6 +28,7 @@ class catlib:
                         return path
                 else:
                         return None
+
         def verify_post(post_request):
                 #TODO
                 #Implement logic for verifying post contents, sanitizing file paths, etc.
@@ -130,4 +135,4 @@ class catlib:
 
 # print(user.username, user.api_key)
 
-catlib.make_current_dir_posts()
+# catlib.make_current_dir_posts()

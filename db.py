@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, joinedload
 from sqlalchemy import Integer, String
 
 class Base(DeclarativeBase):
@@ -17,7 +17,7 @@ class Post(db.Model):
     thumbnail:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     publish_date:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     tags:Mapped[str] = mapped_column(String, unique=False, nullable=True)
-
+    # meta = relationship('PostMeta', back_populates='post', uselist=False)
     def __repr__(self):
         return f"{self.title}"
 
@@ -44,7 +44,7 @@ class PostMeta(db.Model):
     post_id:Mapped[int] = mapped_column(Integer, primary_key=True)
     views:Mapped[str] = db.Column(db.Integer, unique=False, nullable=False)
     updoots:Mapped[str] = db.Column(db.Integer, unique=False, nullable=False)
-
+    # post = relationship('Post', back_populates='meta')
     def __repr__(self):
         return f"{self.title}"
 
@@ -65,3 +65,6 @@ class Author(db.Model):
 #     key:Mapped[str] = mapped_column(String, unique=True, nullable=False)
 #     owner:Mapped[str] = mapped_column(String, unique=True, nullable=False)
 #     expires:Mapped[str] = mapped_column(String, unique=True, nullable=False)
+
+
+# post_with_metadata = Post.query.options(joinedload(Post.meta)).filter_by(post_id='some id').first()

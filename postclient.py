@@ -9,7 +9,7 @@ path = sys.argv[2]
 # password = getpass.getpass("Enter Password:\n")
 
 username = 'mimi'
-key = '27845d491a579791eff9cd372c41ca501ae12f36ee983587e28e19ceba26820f'
+key = '2697348d02d9471727f854a31a6a648f790bcdc8b2725362cb536b7af8c643fe'
 
 data = {
     "request_type": "json",
@@ -24,26 +24,22 @@ with open(f'{path}') as f:
     for element in soup.descendants:
         if isinstance(element, Comment):
             element.extract()
-        data['title']= soup.title.text,
-        data['html_content']= soup.content.text,
-        data['summary']= soup.summary.text,
-        data['tags']= soup.tags.text
-
-    pics = soup.find_all('pic')
-    pics.append(soup.thumbnail)
-    if not pics:
-        pass
-    else:
-        i=0
-        post_files = {}
-        for p in pics:
-            try:
-                i+=1
-                pic = open(f'{p.text}', 'rb')
-                post_files[f'file{i}'] = pic
-            except FileNotFoundError:
-                print('Missing an image file, aborting.')
-                exit()
+    data['title']= soup.title.text,
+    data['html_content']= soup.content.decode_contents(),
+    data['summary']= soup.summary.decode_contents(),
+    data['tags']= soup.tags.text
+    img_soup = BeautifulSoup(post_content, 'html.parser')
+    images = img_soup.find_all('img')
+    post_files = {}
+    j=0
+    for i in images:
+        try:
+            j+=1
+            pic = open(f'{i["src"]}', 'rb')
+            post_files[f'file{i}'] = pic
+        except FileNotFoundError:
+            print('Missing an image file, aborting.')
+            exit()
     response = requests.post('http://127.0.0.1:5001/api/v1/posts/add', data=data, files = post_files)
     print('Server response:\n\n')    
     print(response.text)

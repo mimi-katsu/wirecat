@@ -76,25 +76,39 @@ def add_post():
             if valid:
                 # initialize some useful values
                 now = datetime.now()
+                # generate the realative path for the image 'src' attributes to use
+                path = catlib.html_image_path()
+                # modify the image paths of the included html content and thumbnail to use the servers directory structure
+                content_soup = BeautifulSoup(request.form.get('html_content', None), 'html.parser')
+
+                images = content_soup.find_all('img')
+                # replace image source with the relative path of the image file in servers storage
+                for i in images:
+                    i['src'] = f'{path}/{i["src"]}'
+
+                modified_html_content = str(content_soup)
+
                 # TODO:
                 # Incorporate post ids with post files so that same named files wont overwrite eachother when uploaded
                 post_id = catlib.generate_id()
+                
                 # Create SQLAlchemy object and push it to the database
                 post = Post(
                     title=request.form.get('title', None),
                     author=user.username,
-                    html_content=request.form.get('html_content', None),
+                    html_content=modified_html_content,
                     summary=request.form.get('summary', None),
                     thumbnail=request.form.get('thumbnail', None),
                     tags=request.form.get('tags', None),
                     publish_date=f'{now.year}/{now.month}/{now.day}'
                     )
+
                 db.session.add(post)
                 db.session.commit()
                 #TODO:
                 # Make sure that post files and database contents are both 
                 # removed in the event that one or the other fails
-
+            
                 # validate and post contents. returns true if okay. Raise error if bad
                 if not catlib.verify_post(request):
                     raise InvalidPost
@@ -103,12 +117,12 @@ def add_post():
                     file = request.files[f]
                     if file:
                         filename = secure_filename(file.filename)
-                        # create the directory paths if needed and return the absolute path
-                        path = catlib.make_current_dir_posts()
-                        file.save(f'{path}/{filename}')
-                
-            response = jsonify(type='post', success=True, msg='Post was successfully uploaded'), 200
-        
+                        #file save path is the absolute path for the file on the server
+                        file.save(f'{catlib.file_save_path()}/{filename}')
+
+                response = jsonify(type='post', success=True, msg='Post was successfully uploaded'), 200
+            else:
+                response = jsonify(type='post', success=False, msg='Post was invalidated')
         except IntegrityError as e:
             response = jsonify(type='post', success=False, msg=f'{str(e.orig)}'), 200
         

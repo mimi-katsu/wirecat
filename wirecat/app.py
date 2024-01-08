@@ -6,6 +6,7 @@ from db import db, User, Post
 from config import Config, DevEnv, ProdEnv, Uploads
 import secrets
 from wirecat.util.catlib import catlib
+from sqlalchemy.exc import IntegrityError
 UPLOAD_FOLDER = '/static'
 ALLOWED_EXTENSIONS = {'txt','png', 'jpg', 'jpeg', 'gif', 'md'}
 
@@ -36,38 +37,17 @@ def create_app(test_config=None):
 
     with app.app_context():
         db.create_all()
-        # key = secrets.token_hex(32)
-        # print(key)
         # hash method should = pbkdf2:sha256, remove if it doesnt work
-        # user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', password = generate_password_hash('123123', method='pbkdf2:sha256'), api_key=generate_password_hash(key, method='pbkdf2:sha256'))
-        # db.session.add(user)
-        # db.session.commit()
-        # u = db.session.execute(db.select(user.user_id))
-        # post1 = Post(
-        # title = "Post 1",
-        # summary = "This is a summary of post ONE, its just a small amount of text that describes the post",
-        # author = "Maia",
-        # html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>""",
+        try:
+            key = secrets.token_hex(32)
+            user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', password = generate_password_hash('123123', method='pbkdf2:sha256'), api_key=generate_password_hash(key, method='pbkdf2:sha256'))
+            db.session.add(user)
+            db.session.commit()
+            with open('./mimi.key', 'w') as f:
+                f.write(key)
+        except IntegrityError:
+            print("default user already exists")
 
-        # )
-        # post2 = Post(
-        # title = "Post 2",
-        # summary = "This is a summary of post TWOoowwoo, its just a small amount of text that describes the post",
-        # author = "Maia",
-        # html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>""",
-        # )
-
-        # post3 = Post(
-        # title = "Post 3",
-        # summary = "This is a summary of post THREEEE, its just a small amount of text that describes the post",
-        # author = "Maia",
-        # html_content = """<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur non dolor et libero hendrerit luctus. Pellentesque metus orci, egestas tempus mauris id, ultrices scelerisque arcu. Cras venenatis venenatis massa, vel rutrum dolor laoreet id. Curabitur quis lobortis arcu. Vivamus maximus, sem ac vestibulum molestie, lacus lorem tempor justo, vel mattis dolor diam in ante. Proin ut justo velit. Duis accumsan commodo erat, sit amet molestie mi viverra accumsan. Donec quis fermentum ligula. </p>""",
-        # )
-
-        # db.session.add(post1)
-        # db.session.add(post2)
-        # db.session.add(post3)
-        # db.session.commit()
 
     # Set custom 404 template
     @app.errorhandler(404)
