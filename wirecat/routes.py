@@ -12,7 +12,7 @@ Sections:
         mimi
 """
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 from db import User, Post, PostMeta
@@ -47,9 +47,9 @@ def community():
 def blog():
     return 'Blog'
 
-@wc.route('/blog/<post_id>')
-def blog_post(post_id):
-    p = Post.query.get(post_id)
+@wc.route('/blog/<url_slug>')
+def blog_post(url_slug):
+    p = Post.query.filter_by(slug=url_slug).first()
     return render_template('post.html', post=p)
 
 @wc.route('/login')

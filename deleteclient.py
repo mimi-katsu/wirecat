@@ -4,7 +4,7 @@ import os
 import sys
 
 username = 'mimi'
-key = '2697348d02d9471727f854a31a6a648f790bcdc8b2725362cb536b7af8c643fe'
+key = '6dbf9802e05ee3446a5f15ef949df8bc35fcb4726681b87b9ddce55c0b931dfe'
 
 data = {
     "username": username,

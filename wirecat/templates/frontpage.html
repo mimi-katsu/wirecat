@@ -19,7 +19,7 @@
 
 {% block content %}
 {% for p in best_posts %}
-<a href="/blog/{{p.post_id}}">
+<a href="/blog/{{p.slug}}">
     <div class="carousel card">
             <div class="post">
                 <img src="{{p.thumbnail}}" alt="" class="thumbnail">

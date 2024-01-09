@@ -78,6 +78,9 @@ def add_post():
                 now = datetime.now()
                 # generate the realative path for the image 'src' attributes to use
                 path = catlib.html_image_path()
+
+                # create url slug from title
+                slug = catlib.generate_slug(request.form.get('title', None))
                 # modify the image paths of the included html content and thumbnail to use the servers directory structure
                 content_soup = BeautifulSoup(request.form.get('html_content', None), 'html.parser')
 
@@ -95,6 +98,7 @@ def add_post():
                 # Create SQLAlchemy object and push it to the database
                 post = Post(
                     title=request.form.get('title', None),
+                    slug=slug,
                     author=user.username,
                     html_content=modified_html_content,
                     summary=request.form.get('summary', None),

@@ -4,6 +4,7 @@ from datetime import datetime
 import random
 import string
 import secrets
+import re
 
 class catlib:
 
@@ -33,6 +34,17 @@ class catlib:
                 #TODO
                 #Implement logic for verifying post contents, sanitizing file paths, etc.
                 return True
+
+        def generate_slug(title):
+                # Convert to lowercase
+                slug = title.lower()
+                # Replace spaces and underscores with hyphens
+                slug = re.sub(r'[\s_]+', '-', slug)
+                # Remove all characters that are not alphanumerics or hyphens
+                slug = re.sub(r'[^\w-]', '', slug)
+                # Remove leading, trailing, or multiple consecutive hyphens
+                slug = re.sub(r'-+', '-', slug).strip('-')
+                return slug
 # class Database:
 #     def init_db(self):
 #         # create connection to database
