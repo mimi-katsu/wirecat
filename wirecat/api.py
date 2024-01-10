@@ -10,7 +10,8 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint
 from sqlalchemy.exc import IntegrityError
-from db import User, Post, PostMeta
+from sqlalchemy.orm import joinedload
+from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile
 from wirecat.util.catlib import catlib
 from wirecat.app import db
 
@@ -58,18 +59,19 @@ def add_post():
             response = None
             key = request.form.get('key', None)
             api_user = request.form.get('username', None)
-            
             if not api_user and key:
                 raise InvalidCredentials
 
             if key and api_user:
-                user = User.query.filter_by(username=api_user).first()
-
-            if not user and user.api_key:
+                user = User.query.options(joinedload(User.keys), joinedload(User.profile)).filter_by(username=api_user).first()
+                print(user.id, user.keys.key, user.profile.dob, user.perm)
+                # user_key = ApiKeys.query.filter_by(user_id = user.id).first()
+                print("User: ",user.username, user.keys.key)
+            if not user and user.keys.key:
                 raise InvalidCredentials
             # match password hashes
-            valid = check_password_hash(user.api_key, key)
-
+            valid = check_password_hash(user.keys.key, key)
+            print(valid)
             if not valid:
                 raise InvalidCredentials
 
@@ -98,12 +100,11 @@ def add_post():
                 # Create SQLAlchemy object and push it to the database
                 post = Post(
                     title=request.form.get('title', None),
+                    user_id = user.id,
                     slug=slug,
-                    author=user.username,
                     html_content=modified_html_content,
                     summary=request.form.get('summary', None),
                     thumbnail=request.form.get('thumbnail', None),
-                    tags=request.form.get('tags', None),
                     publish_date=f'{now.year}/{now.month}/{now.day}'
                     )
 

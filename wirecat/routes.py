@@ -15,7 +15,8 @@ import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
-from db import User, Post, PostMeta
+from sqlalchemy.orm import joinedload
+from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile
 from wirecat.util.w_secrets import Secrets
 s = Secrets()
 
@@ -29,7 +30,8 @@ wc = Blueprint('wirecat', __name__)
 @wc.route('/')
 def home():
     post_id = 1
-    best = Post.query.all()
+    best = Post.query.options(joinedload(Post.author)).all()
+    print(best[0].author.email)
     for b in best:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
@@ -43,11 +45,11 @@ def downloads():
 def community():
     return render_template('forum.html')
 
-@wc.route('/blog')
+@wc.route('/p')
 def blog():
     return 'Blog'
 
-@wc.route('/blog/<url_slug>')
+@wc.route('/post/<url_slug>')
 def blog_post(url_slug):
     p = Post.query.filter_by(slug=url_slug).first()
     return render_template('post.html', post=p)

@@ -2,7 +2,7 @@ import os
 from werkzeug.security import generate_password_hash
 from flask import Flask, render_template
 from flask_jwt_extended import JWTManager
-from db import db, User, Post
+from db import db, User, Post, PostMeta, UserMeta, ApiKeys, Profile
 from config import Config, DevEnv, ProdEnv, Uploads
 import secrets
 from wirecat.util.catlib import catlib
@@ -18,7 +18,6 @@ def create_app(test_config=None):
     app.config.from_object(Config())
     app.config.from_object(Uploads())
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'cat.sqlite')
-
     
     if test_config is None:
         # load the instance config, if it exists, when not testing
@@ -39,12 +38,26 @@ def create_app(test_config=None):
         db.create_all()
         # hash method should = pbkdf2:sha256, remove if it doesnt work
         try:
-            key = secrets.token_hex(32)
-            user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', password = generate_password_hash('123123', method='pbkdf2:sha256'), api_key=generate_password_hash(key, method='pbkdf2:sha256'))
+            mimi_key = secrets.token_hex(32)
+            user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', verified = True, creation_date='123',password = generate_password_hash('123123', method='pbkdf2:sha256'))
+            
             db.session.add(user)
             db.session.commit()
+            user = User.query.filter_by(username = 'mimi').first()
+            print(user)
+            profile = Profile(user_id=user.id, gender='something', about='nothing', dob='1111/11/11')
+            db.session.add(profile)
+            newkey = ApiKeys(user_id = user.id, key = generate_password_hash(mimi_key, method='pbkdf2:sha256'), expires='never')
+            print(user.id, newkey.user_id, newkey.key)
+            # meta = UserMeta(user_id=user.id)
+            # print(meta.user_id)
+            # db.session.add(meta)
+            db.session.add(newkey)
+            db.session.commit()
+            key = ApiKeys.query.filter_by(user_id = user.id).first()
+            print(key.key)
             with open('./mimi.key', 'w') as f:
-                f.write(key)
+                f.write(mimi_key)
         except IntegrityError:
             print("default user already exists")
 
