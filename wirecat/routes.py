@@ -18,6 +18,8 @@ from sqlalchemy.sql import func
 from sqlalchemy.orm import joinedload
 from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile
 from wirecat.util.w_secrets import Secrets
+from wirecat.app import db
+
 s = Secrets()
 
 wc = Blueprint('wirecat', __name__)
@@ -30,12 +32,12 @@ wc = Blueprint('wirecat', __name__)
 @wc.route('/')
 def home():
     post_id = 1
-    best = Post.query.options(joinedload(Post.author)).all()
-    print(best[0].author.email)
+    best = Post.query.all()
     for b in best:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
     return render_template('frontpage.html', best_posts=[best[0]], all_posts = best)
+
     # return render_template('frontpage.html')
 @wc.route('/downloads')
 def downloads():
@@ -51,7 +53,12 @@ def blog():
 
 @wc.route('/post/<url_slug>')
 def blog_post(url_slug):
-    p = Post.query.filter_by(slug=url_slug).first()
+    p = Post.query.options(joinedload(Post.author)).filter_by(slug=url_slug).first()
+    if not p.meta:
+        meta = PostMeta(post_id=p.id)
+        db.session.add(meta)
+    p.meta.views += 1
+    db.session.commit()
     return render_template('post.html', post=p)
 
 @wc.route('/login')
