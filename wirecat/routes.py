@@ -53,14 +53,18 @@ def blog():
 
 @wc.route('/post/<url_slug>')
 def blog_post(url_slug):
+    p = get_post(url_slug)
+    return render_template('post.html', post=p)
+
+@wc.route('/login')
+def login():
+    return render_template('login.html')
+
+def get_post(url_slug):
     p = Post.query.options(joinedload(Post.author)).filter_by(slug=url_slug).first()
     if not p.meta:
         meta = PostMeta(post_id=p.id)
         db.session.add(meta)
     p.meta.views += 1
     db.session.commit()
-    return render_template('post.html', post=p)
-
-@wc.route('/login')
-def login():
-    return render_template('login.html')
+    return p
