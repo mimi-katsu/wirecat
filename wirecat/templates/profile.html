@@ -1,0 +1,21 @@
+{% extends 'main.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="/static/css/profile.css">
+{% endblock %}
+
+{% block content %}
+<p>{{user.email}}</p>
+<p>{{user.first_name}}</p>
+<p>{{user.last_name}}</p>
+<p>{{user.profile.about}}</p>
+<p>{{user.profile.gender}}</p>
+<p>{{user.profile.dob}}</p>
+
+{% if posts %}
+    {% for post in posts %}
+        <div>{{post.title}}</div>
+
+    {% endfor %}
+{% endif %}
+{% endblock %}

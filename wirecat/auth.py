@@ -27,7 +27,7 @@ def login_api():
         if username and password:
             user = User.query.filter_by(username=username).first()
 
-            if user is None:
+            if user is None or user.perm=='banned':
                 # If user doesn't exist, redirect back to login and display invalid login message
                 flash('Invalid login')
                 return redirect('/login')
@@ -37,19 +37,12 @@ def login_api():
         valid = check_password_hash(user.password, password)
 
         if valid:
-            # check for request_type filed in form. If it exists, a json response is built. If not, a redirection response to /home is built and the token
-            # is set as a cookie. This is so that scripts that require json can interact with the api, but no unneccessary info is sent to a browser client
-            if req_type == 'json':
-                expiry = datetime.timedelta(minutes=1)
-                token = create_access_token(identity=username, expires_delta=expiry)
-                response = jsonify(logged_in=True, access_token_cookie=token, csrf_access_token = get_csrf_token(encoded_token=token))
-                return response
-            else:
-                expiry = datetime.timedelta(hours=12)
-                token = create_access_token(identity=username, expires_delta=expiry)
-                response = make_response(redirect(url_for('wirecat.home')))
-                set_access_cookies(response, token)
-                return response
+            # create jwt token and set as cookie in client browser
+            expiry = datetime.timedelta(hours=12)
+            token = create_access_token(identity=username, expires_delta=expiry)
+            response = make_response(redirect(url_for('wirecat.dashboard')))
+            set_access_cookies(response, token)
+            return response
         else:
             # if credentials are invalid, redirect back to login and display invalid login message
             flash('Invalid login')

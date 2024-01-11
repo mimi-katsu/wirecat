@@ -1,12 +1,15 @@
 import os
 from werkzeug.security import generate_password_hash
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 from flask_jwt_extended import JWTManager
 from db import db, User, Post, PostMeta, UserMeta, ApiKeys, Profile
 from config import Config, DevEnv, ProdEnv, Uploads
 import secrets
 from wirecat.util.catlib import catlib
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
+from flask_jwt_extended.exceptions import NoAuthorizationError
+
 UPLOAD_FOLDER = '/static'
 ALLOWED_EXTENSIONS = {'txt','png', 'jpg', 'jpeg', 'gif', 'md'}
 
@@ -78,6 +81,10 @@ def create_app(test_config=None):
     from .auth import wc_auth
     app.register_blueprint(wc_auth)
     jwt = JWTManager(app)
+
+    @jwt.unauthorized_loader
+    def unauthorized_callback(error_string):
+        return redirect(url_for('wirecat.login'))
     return app
 
 app = create_app()

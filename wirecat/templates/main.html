@@ -19,7 +19,13 @@
                 <a href="/home" class="header-nav">Home</a>
                 <a href="/forum" class="header-nav">Forum</a>
                 <a href="/downloads" class="header-nav">Downloads</a>
-                <a href="/login" class="header-nav">Login</a>       
+                {% if logged_in %}
+                    <!-- Display profile button if logged in -->
+                    <a href="/dashboard">Dashboard</a>
+                {% else %}
+                    <!-- Display login button if not logged in -->
+                    <a href="/login">Login</a>
+                {% endif %}       
         </div>
     </div>
     {% block nav %}{% endblock %}
