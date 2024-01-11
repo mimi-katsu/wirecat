@@ -10,18 +10,24 @@
             <div class="post-info">
                 <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
                 <div class="post-info-text">
-                    <h1>{{post.title}} Views: {{post.meta.views}}</h1>
+                    <h1>{{post.title}}</h1>
                     <p>{{post.publish_date}}</p>
-                    <p>By <a href="/profiles/{{post.author.username}}">{{post.author}}</a></p>
+                    <p>By <a href="/profiles/{{post.author.username}}" class="link">{{post.author}}</a></p>
                     <p>{{post.summary}}</p>
                 </div>
+                <div class="post-buttons">
+                    <div class="like">3</div>
+                    <div class="share">S</div>
+                    <div class="link">L</div>
+                </div>
             </div>
-            <div class="post-buttons">
-                <div class="like">3</div>
-                <div class="share">S</div>
-                <div class="link">L</div>
+            <div class="post-stats">
+                Views: {{post.meta.views}}
+                Favorites: {{post.meta.favorites}}
+                UPvotes: {{post.meta.upvotes}}
             </div>
         </div>
+        
         <div class="post-content">
             {{post.html_content | safe}}
         </div>

@@ -12,7 +12,7 @@ Sections:
         mimi
 """
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint, abort
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint, abort, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, jwt_required
 from flask_jwt_extended.exceptions import NoAuthorizationError
@@ -21,7 +21,7 @@ from sqlalchemy.orm import joinedload
 from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile
 from wirecat.util.w_secrets import Secrets
 from wirecat.app import db
-
+from wirecat.util.catlib import catlib
 s = Secrets()
 
 wc = Blueprint('wirecat', __name__)
@@ -33,13 +33,39 @@ wc = Blueprint('wirecat', __name__)
 @wc.route('/index')
 @wc.route('/')
 def home():
-    featured = Post.query.filter_by(featured=True).limit(5)
-    latest = Post.query.order_by(Post.publish_date).limit(5)
-    best = Post.query.join(PostMeta).order_by(PostMeta.views.desc()).limit(5).all()
+    cache = current_app.cache
+
+    featured = cache.get('featured')
+    if featured:
+        featured = catlib.deserialize_posts(featured)
+
+    latest = cache.get('latest')
+    if latest:
+        latest = catlib.deserialize_posts(latest)
+
+    best = cache.get('best')
+    if best:
+        best = catlib.deserialize_posts(best)
+
+    if not featured:
+        featured = Post.query.filter_by(featured=True).limit(5)
+        to_cache = catlib.serialize_posts(featured)
+        cache.set('featured', to_cache)
+
+    if not latest:
+        latest = Post.query.order_by(Post.publish_date).limit(5)
+        to_cache = catlib.serialize_posts(latest)
+        cache.set('latest', to_cache)
+
+    if not best:
+        best = Post.query.join(PostMeta).order_by(PostMeta.views.desc()).limit(5).all()
+        to_cache = catlib.serialize_posts(best)
+        cache.set('best', to_cache)
+
     for b in featured:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
-    return render_template('frontpage.html', featured=[featured[0]], latest_posts = latest, best_posts = best)
+    return render_template('frontpage.html', featured=featured, latest_posts = latest, best_posts = best)
 
 @wc.route('/profiles/<user_slug>')
 def profile(user_slug):

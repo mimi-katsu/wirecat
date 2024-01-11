@@ -7,7 +7,7 @@ from flask_jwt_extended.exceptions import NoAuthorizationError
 from werkzeug.security import generate_password_hash
 from flask import Flask, render_template, redirect, url_for
 from flask_jwt_extended import JWTManager
-
+from flask_caching import Cache
 from db import db, User, Post, PostMeta, UserMeta, ApiKeys, Profile
 from config import Config, DevEnv, ProdEnv, Uploads
 from wirecat.util.catlib import catlib
@@ -23,7 +23,9 @@ def create_app(test_config=None):
     app.config.from_object(Config())
     app.config.from_object(Uploads())
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(app.instance_path, 'cat.sqlite')
-    
+    app.config['CACHE_TYPE'] = 'simple'
+    app.config['CACHE_DEFAULT_TIMEOUT'] = 300
+
     if test_config is None:
         # load the instance config, if it exists, when not testing
         app.config.from_pyfile('config.py', silent=True)
@@ -44,7 +46,6 @@ def create_app(test_config=None):
         try:
             mimi_key = secrets.token_hex(32)
             user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', verified = True, creation_date='123',password = generate_password_hash('123123', method='pbkdf2:sha256'), perm='superadmin')
-            
             db.session.add(user)
             db.session.commit()
             user = User.query.filter_by(username = 'mimi').first()
@@ -77,11 +78,14 @@ def create_app(test_config=None):
     app.register_blueprint(wc_auth)
     #init JWT token manager
     jwt = JWTManager(app)
-
+    cache = Cache(app)
+    cache.init_app(app)
+    app.cache = cache
     #Force a redirect to login page when JWT token is expired or doesnt exist. Default returns json
     @jwt.unauthorized_loader
     def unauthorized_callback(error_string):
         return redirect(url_for('wirecat.login'))
+
     return app
 
 app = create_app()

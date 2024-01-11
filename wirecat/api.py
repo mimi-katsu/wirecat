@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint, current_app
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
@@ -122,7 +122,14 @@ def add_post():
                 #TODO:
                 # Make sure that post files and database contents are both 
                 # removed in the event that one or the other fails
-            
+
+
+                # Update latest post cache
+                cache = current_app.cache
+                latest = Post.query.order_by(Post.publish_date).limit(5)
+                to_cache = catlib.serialize_posts(latest)
+                cache.set('latest', to_cache)
+
                 response = jsonify(type='post', success=True, msg='Post was successfully uploaded'), 200
             else:
                 response = jsonify(type='post', success=False, msg='Post was invalidated')
@@ -227,6 +234,12 @@ def add_to_featured(post_slug):
             
             post.featured = True
             db.session.commit()
+
+            # Update featured post cache
+            cache = current_app.cache
+            featured = Post.query.order_by(Post.publish_date).limit(5)
+            to_cache = catlib.serialize_posts(featured)
+            cache.set('featured', to_cache)
 
             response = jsonify(type='feature', success=True, msg='Post was successfully featured'), 200
 

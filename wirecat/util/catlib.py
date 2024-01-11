@@ -5,7 +5,7 @@ import random
 import string
 import secrets
 import re
-
+from db import Post
 class catlib:
 
         def generate_api_key():
@@ -45,3 +45,25 @@ class catlib:
                 # Remove leading, trailing, or multiple consecutive hyphens
                 slug = re.sub(r'-+', '-', slug).strip('-')
                 return slug
+        
+        def serialize_posts(orm_obj_list):
+                posts = []
+                for obj in orm_obj_list:
+                        post = {}
+                        post['id'] = obj.id
+                        post['post_id']=obj.post_id
+                        post['slug']=obj.slug
+                        post['title']=obj.title
+                        post['summary']=obj.summary
+                        post['thumbnail']=obj.thumbnail
+                        post['publish_date']=obj.publish_date
+                        posts.append(post)
+                return posts
+
+
+        def deserialize_posts(serialized_obj_list):
+                posts = []
+                for obj in serialized_obj_list:
+                        post = Post(id=obj['id'], post_id=obj['post_id'],slug=obj['slug'], title=obj['title'], summary=obj['summary'], thumbnail=obj['thumbnail'], publish_date=obj['publish_date'])
+                        posts.append(post)
+                return posts

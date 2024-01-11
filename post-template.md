@@ -1,5 +1,5 @@
 <!-- Title of the post-->
-<title><h1>Post sorting test 1</h1></title>
+<title><h1>Post caching test 2</h1></title>
 
 <!--Path to the thumbnail pic-->
 <thumbnail><img src='cats5.jpg' class='thumbnail'></thumbnail>

@@ -1,5 +1,5 @@
 :root {
-    --background-color-main: black;
+    --background-color-main: white;
     --background-color-secondary: rgb(13, 13, 13);
     --background-color-tertiary: lightgray;
     --border-color-main: white ;
@@ -13,7 +13,7 @@
     
     background-color: var(--background-color-main);
 }
-a {
+a .link {
   color: rgb(129, 64, 194);
 
 }
@@ -71,7 +71,7 @@ a {
   }
 
 body {
-    /* background-image: url('/static/images/post1.jpg'); */
+    background-image: url('/static/images/background.svg');
     background-size: cover;
     background-attachment: fixed;
     background-repeat: no-repeat;
@@ -135,7 +135,6 @@ body {
   align-items: start;
   padding: 1em;
   justify-content: center;
-  max-width: 90em;
 }
 
 .card {
