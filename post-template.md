@@ -1,8 +1,8 @@
 <!-- Title of the post-->
-<title><h1>thumbnail upload test 5: The end</h1></title>
+<title><h1>Post sorting test 1</h1></title>
 
 <!--Path to the thumbnail pic-->
-<thumbnail><img src='cats3.jpg' class='thumbnail'></thumbnail>
+<thumbnail><img src='cats5.jpg' class='thumbnail'></thumbnail>
 
 <!--Summary of the main content of the post. should be two sentences MAX!-->
 <summary>

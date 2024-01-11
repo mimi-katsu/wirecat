@@ -40,11 +40,14 @@ def home():
     # except NoAuthorizationError:
     #     current_user = None
     #     is_logged_in = False
-    best = Post.query.all()
-    for b in best:
+    # best = Post.query.all()
+    featured = Post.query.filter_by(featured=True).limit(5)
+    latest = Post.query.order_by(Post.publish_date).limit(5)
+    best = Post.query.join(PostMeta).order_by(PostMeta.views.desc()).limit(5).all()
+    for b in featured:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
-    return render_template('frontpage.html', best_posts=[best[0]], all_posts = best)
+    return render_template('frontpage.html', featured=[featured[0]], latest_posts = latest, best_posts = best)
 
     # return render_template('frontpage.html')
 
@@ -94,6 +97,8 @@ def get_post(url_slug):
     p.meta.views += 1
     db.session.commit()
     print(p.publish_date)
+    print(p.featured)
+
     return p
 
 @wc.context_processor

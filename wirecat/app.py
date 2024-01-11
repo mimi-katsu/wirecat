@@ -42,7 +42,7 @@ def create_app(test_config=None):
         # hash method should = pbkdf2:sha256, remove if it doesnt work
         try:
             mimi_key = secrets.token_hex(32)
-            user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', verified = True, creation_date='123',password = generate_password_hash('123123', method='pbkdf2:sha256'))
+            user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', verified = True, creation_date='123',password = generate_password_hash('123123', method='pbkdf2:sha256'), perm='superadmin')
             
             db.session.add(user)
             db.session.commit()

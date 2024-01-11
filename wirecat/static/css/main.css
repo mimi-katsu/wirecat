@@ -121,8 +121,8 @@ body {
 }
 .content {
   justify-self: center;
-
   display: flex;
+  flex-direction: column;
   grid-row-start: 3;
   align-items: start;
   padding: 1em;

@@ -18,7 +18,7 @@
 {% endblock %}
 
 {% block content %}
-{% for p in best_posts %}
+{% for p in featured %}
 <a href="/post/{{p.slug}}">
     <div class="carousel card">
             <div class="post">
@@ -32,13 +32,29 @@
 </a>
 {% endfor %}
 
-{% for a in all_posts %}
+<h2>Latest</h2>
+{% for a in latest_posts %}
 <a href="/post/{{a.slug}}">
     <div class="carousel card">
             <div class="post">
                 <img src="/static/posts/{{a.publish_date}}/{{a.thumbnail}}" alt="" class="thumbnail">
                 <div class="carousel-overlay">
                     <p class="post-title">{{a.title}}</p>
+                    <div class="black-overlay"></div>
+                </div>
+            </div>
+    </div>
+</a>
+{% endfor %}
+
+<h2>Recommended</h2>
+{% for b in best_posts %}
+<a href="/post/{{b.slug}}">
+    <div class="carousel card">
+            <div class="post">
+                <img src="/static/posts/{{b.publish_date}}/{{b.thumbnail}}" alt="" class="thumbnail">
+                <div class="carousel-overlay">
+                    <p class="post-title">{{b.title}}</p>
                     <div class="black-overlay"></div>
                 </div>
             </div>

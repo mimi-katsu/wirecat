@@ -208,8 +208,49 @@ def update_posts():
         # wirecat.posts.update(wirecat.db.get_recent_posts())
         return 'posts updated', 200
 
-@wc_api.route('/api/v1/posts/highlight')
+@wc_api.route('/api/v1/posts/highlight/<post_slug>')
+def add_to_featured(post_slug):
+    try:
+        response = None
+        key = request.form.get('key', None)
+        api_user = request.form.get('username', None)
+        
+        if not api_user and key:
+            raise InvalidCredentials
 
+        if key and api_user:
+            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+            if user.perm != 'superadmin':
+                raise InvalidCredentials
+        if not user and user.api_key:
+            raise InvalidCredentials
+        # match password hashes
+        valid = check_password_hash(user.keys.key, key)
+
+        if not valid:
+            raise InvalidCredentials
+        
+        if valid:
+            post = Post.query.filter_by(slug=post_slug).first()
+            if not post:
+                raise DoesNotExist
+            
+            post.featured = True
+            print(post.featured)
+            db.session.commit()
+
+            response = jsonify(type='feature', success=True, msg='Post was successfully featured'), 200
+
+    except InvalidCredentials as e:
+        response = jsonify(type='feature', success=False, msg=f'{e}'), 200
+
+    except DoesNotExist as e:
+        repsonse = jsonify(type='feature', success=False, msg=f'{e}'), 200
+    finally:
+        if not response:
+            response = jsonify(error="Something unexpected happened")
+        return response
+    
 @wc_api.route('/api/v1/posts/highlight/add')
 
 @wc_api.route('/api/v1/posts/highlight/remove')
