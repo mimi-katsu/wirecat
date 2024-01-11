@@ -1,14 +1,16 @@
 import os
-from werkzeug.security import generate_password_hash
-from flask import Flask, render_template, redirect, url_for
-from flask_jwt_extended import JWTManager
-from db import db, User, Post, PostMeta, UserMeta, ApiKeys, Profile
-from config import Config, DevEnv, ProdEnv, Uploads
 import secrets
-from wirecat.util.catlib import catlib
+
 from sqlalchemy.exc import IntegrityError
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request
 from flask_jwt_extended.exceptions import NoAuthorizationError
+from werkzeug.security import generate_password_hash
+from flask import Flask, render_template, redirect, url_for
+from flask_jwt_extended import JWTManager
+
+from db import db, User, Post, PostMeta, UserMeta, ApiKeys, Profile
+from config import Config, DevEnv, ProdEnv, Uploads
+from wirecat.util.catlib import catlib
 
 UPLOAD_FOLDER = '/static'
 ALLOWED_EXTENSIONS = {'txt','png', 'jpg', 'jpeg', 'gif', 'md'}
@@ -39,7 +41,6 @@ def create_app(test_config=None):
 
     with app.app_context():
         db.create_all()
-        # hash method should = pbkdf2:sha256, remove if it doesnt work
         try:
             mimi_key = secrets.token_hex(32)
             user = User(username='mimi', first_name='mimi', last_name='???',email = 'mimi@wirecat.org', verified = True, creation_date='123',password = generate_password_hash('123123', method='pbkdf2:sha256'), perm='superadmin')
@@ -47,18 +48,12 @@ def create_app(test_config=None):
             db.session.add(user)
             db.session.commit()
             user = User.query.filter_by(username = 'mimi').first()
-            print(user)
             profile = Profile(user_id=user.id, gender='something', about='nothing', dob='1111/11/11')
             db.session.add(profile)
             newkey = ApiKeys(user_id = user.id, key = generate_password_hash(mimi_key, method='pbkdf2:sha256'), expires='never')
-            print(user.id, newkey.user_id, newkey.key)
-            # meta = UserMeta(user_id=user.id)
-            # print(meta.user_id)
-            # db.session.add(meta)
             db.session.add(newkey)
             db.session.commit()
             key = ApiKeys.query.filter_by(user_id = user.id).first()
-            print(key.key)
             with open('./mimi.key', 'w') as f:
                 f.write(mimi_key)
         except IntegrityError:
@@ -80,8 +75,10 @@ def create_app(test_config=None):
     #register auth blueprint
     from .auth import wc_auth
     app.register_blueprint(wc_auth)
+    #init JWT token manager
     jwt = JWTManager(app)
 
+    #Force a redirect to login page when JWT token is expired or doesnt exist. Default returns json
     @jwt.unauthorized_loader
     def unauthorized_callback(error_string):
         return redirect(url_for('wirecat.login'))

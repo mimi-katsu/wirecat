@@ -3,14 +3,16 @@ import random
 import string
 import json
 from datetime import datetime
+
 from bs4 import BeautifulSoup
-from flask_sqlalchemy import SQLAlchemy
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
+from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
+
 from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile
 from wirecat.util.catlib import catlib
 from wirecat.app import db
@@ -43,8 +45,6 @@ def v1_help():
 @wc_api.route('/api/v1/posts/get')
 def get_posts():
     posts = Post.query.all()
-    for p in posts:
-        print(p.title, p.summary, p.author)
     #TODO:
     #   return json explaining how to auth and which child routes are available
     return redirect(url_for('wirecat.home')), 200
@@ -64,14 +64,11 @@ def add_post():
 
             if key and api_user:
                 user = User.query.options(joinedload(User.keys), joinedload(User.profile)).filter_by(username=api_user).first()
-                print(user.id, user.keys.key, user.profile.dob, user.perm)
                 # user_key = ApiKeys.query.filter_by(user_id = user.id).first()
-                print("User: ",user.username, user.keys.key)
             if not user and user.keys.key:
                 raise InvalidCredentials
             # match password hashes
             valid = check_password_hash(user.keys.key, key)
-            print(valid)
             if not valid:
                 raise InvalidCredentials
 
@@ -87,7 +84,6 @@ def add_post():
                 # TODO:
                 # Incorporate post ids with post files so that same named files wont overwrite eachother when uploaded
                 post_id = catlib.generate_id()
-                print(post_id)
                 # validate and post contents. returns true if okay. Raise error if bad
                 if not catlib.verify_post(request):
                     raise InvalidPost
@@ -97,19 +93,15 @@ def add_post():
                     file = request.files[f]
                     if file:
                         filename = secure_filename(file.filename)
-                        print(filename)
                         #file save path is the absolute path for the file on the server
                         file.save(f'{catlib.file_save_path()}/{post_id}-{filename}')
-                        print(f'{catlib.file_save_path()}/{post_id}-{filename}')
                 # modify the image paths of the included html content and thumbnail to use the servers directory structure
                 content_soup = BeautifulSoup(request.form.get('html_content', None), 'html.parser')
 
                 images = content_soup.find_all('img')
-                print(images)
                 # replace image source with the relative path of the image file in servers storage
                 for i in images:
                     i['src'] = f'{path}/{post_id}-{i["src"]}'
-                    print(i)
                 modified_html_content = str(content_soup)
                 # Create SQLAlchemy object and push it to the database
 
@@ -123,10 +115,8 @@ def add_post():
                     publish_date=f'{now.year}/{now.month}/{now.day}'
                     )
                 
-                print('123')
                 if request.form.get('thumbnail', None):
                     post.thumbnail = f'{post_id}-{request.form.get("thumbnail")}'
-                print('thumb: ',post.thumbnail)    
                 db.session.add(post)
                 db.session.commit()
                 #TODO:
@@ -236,7 +226,6 @@ def add_to_featured(post_slug):
                 raise DoesNotExist
             
             post.featured = True
-            print(post.featured)
             db.session.commit()
 
             response = jsonify(type='feature', success=True, msg='Post was successfully featured'), 200

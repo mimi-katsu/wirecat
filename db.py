@@ -1,9 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, backref
-from sqlalchemy import Integer, String, Boolean, JSON, DateTime, ForeignKey
-from datetime import datetime
-import uuid
+from sqlalchemy import Integer, String, Boolean, ForeignKey
 class Base(DeclarativeBase):
   pass
 

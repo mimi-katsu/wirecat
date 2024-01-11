@@ -33,14 +33,6 @@ wc = Blueprint('wirecat', __name__)
 @wc.route('/index')
 @wc.route('/')
 def home():
-    # try:
-    #     verify_jwt_in_request(optional=True)
-    #     current_user = get_jwt_identity()
-    #     is_logged_in = True
-    # except NoAuthorizationError:
-    #     current_user = None
-    #     is_logged_in = False
-    # best = Post.query.all()
     featured = Post.query.filter_by(featured=True).limit(5)
     latest = Post.query.order_by(Post.publish_date).limit(5)
     best = Post.query.join(PostMeta).order_by(PostMeta.views.desc()).limit(5).all()
@@ -48,8 +40,6 @@ def home():
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
     return render_template('frontpage.html', featured=[featured[0]], latest_posts = latest, best_posts = best)
-
-    # return render_template('frontpage.html')
 
 @wc.route('/profiles/<user_slug>')
 def profile(user_slug):
@@ -96,9 +86,6 @@ def get_post(url_slug):
         db.session.commit()
     p.meta.views += 1
     db.session.commit()
-    print(p.publish_date)
-    print(p.featured)
-
     return p
 
 @wc.context_processor
@@ -109,14 +96,3 @@ def check_login():
     if current_user:
         login_status=  {'logged_in':True}
     return login_status
-    # try:
-    #     verify_jwt_in_request(optional=True)
-    #     current_user = get_jwt_identity()
-    #     print(current_user)
-    #     login_status=  {'logged_in':True}
-    # except NoAuthorizationError:
-    #     current_user = None
-    #     login_status = {'logged_in': False}
-
-    # finally:
-        # return login_status
