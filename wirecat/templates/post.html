@@ -8,11 +8,11 @@
     <div class="post card">
         <div class="post-head">
             <div class="post-info">
-                <img src="/static/images/default-thumb.png" alt="">
+                <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
                 <div class="post-info-text">
-                    <h1>{{post.title}}</h1>
+                    <h1>{{post.title}} Views: {{post.meta.views}}</h1>
                     <p>{{post.publish_date}}</p>
-                    <p>By {{post.author}}{{post.author.profile.dob}}{{post.meta.views}}</p>
+                    <p>By <a href="/profiles/{{post.author.username}}">{{post.author}}</a></p>
                     <p>{{post.summary}}</p>
                 </div>
             </div>

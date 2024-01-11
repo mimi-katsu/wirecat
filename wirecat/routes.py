@@ -93,6 +93,7 @@ def get_post(url_slug):
         db.session.commit()
     p.meta.views += 1
     db.session.commit()
+    print(p.publish_date)
     return p
 
 @wc.context_processor

@@ -11,7 +11,7 @@ class catlib:
         def generate_api_key():
                 return secrets.token_hex(32)
 
-        def generate_id(length=12):
+        def generate_id(length=24):
                 '''create an alphanumeric post id if it doesn't exist already'''
                 characters = string.ascii_letters + string.digits 
                 random_id = ''.join(random.choice(characters) for _ in range(length))

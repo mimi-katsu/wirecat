@@ -83,48 +83,56 @@ def add_post():
 
                 # create url slug from title
                 slug = catlib.generate_slug(request.form.get('title', None))
-                # modify the image paths of the included html content and thumbnail to use the servers directory structure
-                content_soup = BeautifulSoup(request.form.get('html_content', None), 'html.parser')
-
-                images = content_soup.find_all('img')
-                # replace image source with the relative path of the image file in servers storage
-                for i in images:
-                    i['src'] = f'{path}/{i["src"]}'
-
-                modified_html_content = str(content_soup)
 
                 # TODO:
                 # Incorporate post ids with post files so that same named files wont overwrite eachother when uploaded
                 post_id = catlib.generate_id()
-                
+                print(post_id)
+                # validate and post contents. returns true if okay. Raise error if bad
+                if not catlib.verify_post(request):
+                    raise InvalidPost
+
+                # Save the included files in a directory structure based on the date (YYYY/MM/DD)
+                for f in request.files:
+                    file = request.files[f]
+                    if file:
+                        filename = secure_filename(file.filename)
+                        print(filename)
+                        #file save path is the absolute path for the file on the server
+                        file.save(f'{catlib.file_save_path()}/{post_id}-{filename}')
+                        print(f'{catlib.file_save_path()}/{post_id}-{filename}')
+                # modify the image paths of the included html content and thumbnail to use the servers directory structure
+                content_soup = BeautifulSoup(request.form.get('html_content', None), 'html.parser')
+
+                images = content_soup.find_all('img')
+                print(images)
+                # replace image source with the relative path of the image file in servers storage
+                for i in images:
+                    i['src'] = f'{path}/{post_id}-{i["src"]}'
+                    print(i)
+                modified_html_content = str(content_soup)
                 # Create SQLAlchemy object and push it to the database
+
                 post = Post(
                     title=request.form.get('title', None),
                     user_id = user.id,
+                    post_id = post_id,
                     slug=slug,
                     html_content=modified_html_content,
                     summary=request.form.get('summary', None),
-                    thumbnail=request.form.get('thumbnail', None),
                     publish_date=f'{now.year}/{now.month}/{now.day}'
                     )
-
+                
+                print('123')
+                if request.form.get('thumbnail', None):
+                    post.thumbnail = f'{post_id}-{request.form.get("thumbnail")}'
+                print('thumb: ',post.thumbnail)    
                 db.session.add(post)
                 db.session.commit()
                 #TODO:
                 # Make sure that post files and database contents are both 
                 # removed in the event that one or the other fails
             
-                # validate and post contents. returns true if okay. Raise error if bad
-                if not catlib.verify_post(request):
-                    raise InvalidPost
-                # Save the included files in a directory structure based on the date (YYYY/MM/DD)
-                for f in request.files:
-                    file = request.files[f]
-                    if file:
-                        filename = secure_filename(file.filename)
-                        #file save path is the absolute path for the file on the server
-                        file.save(f'{catlib.file_save_path()}/{filename}')
-
                 response = jsonify(type='post', success=True, msg='Post was successfully uploaded'), 200
             else:
                 response = jsonify(type='post', success=False, msg='Post was invalidated')

@@ -11,6 +11,7 @@ db = SQLAlchemy(model_class=Base)
 
 class Post(db.Model):
     id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    post_id:Mapped[str] = mapped_column(String, unique=True, nullable=False) 
     user_id:Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)
     slug:Mapped[str] = mapped_column(String, unique=True, nullable=False)
     title:Mapped[str] = mapped_column(String, unique=True, nullable=False)

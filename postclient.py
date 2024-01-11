@@ -29,20 +29,28 @@ with open('./mimi.key', 'r') as f:
         data['title']= soup.title.text,
         data['html_content']= soup.content.decode_contents(),
         data['summary']= soup.summary.decode_contents(),
+        data['thumbnail'] = soup.thumbnail.decode_contents()
         data['tags']= soup.tags.text
+
         img_soup = BeautifulSoup(post_content, 'html.parser')
-        images = img_soup.find_all('img')
         post_files = {}
+        images = img_soup.find_all('img')
         j=0
         for i in images:
             try:
                 j+=1
                 pic = open(f'{i["src"]}', 'rb')
-                post_files[f'file{i}'] = pic
+                if i['class'][0] == 'thumbnail':
+                    post_files['thumbnail'] = pic
+                    data['thumbnail'] = i['src']
+                else:
+                    post_files[f'file{i}'] = pic
             except FileNotFoundError:
                 print('Missing an image file, aborting.')
                 exit()
         response = requests.post('http://127.0.0.1:5001/api/v1/posts/add', data=data, files = post_files)
+        for n,f in post_files.items():
+            f.close()
         print('Server response:\n\n')    
         print(response.text)
 
