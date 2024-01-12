@@ -18,7 +18,7 @@
 {% endblock %}
 {% block content %}
 <h2>Featured posts</h2>
-
+<div class="section">
 {% for p in featured %}
 <a href="/post/{{p.slug}}">
     <div class="carousel card">
@@ -32,6 +32,8 @@
     </div>
 </a>
 {% endfor %}
+</div>
+<div class="section">
 
 <h2>Latest</h2>
 {% for a in latest_posts %}
@@ -47,7 +49,8 @@
     </div>
 </a>
 {% endfor %}
-
+</div>
+<div class="section">
 <h2>Recommended</h2>
 {% for b in best_posts %}
 <a href="/post/{{b.slug}}">
@@ -62,4 +65,5 @@
     </div>
 </a>
 {% endfor %}
+</div>
 {% endblock %}

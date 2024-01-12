@@ -1,11 +1,11 @@
 :root {
-    --background-color-main: white;
+    --background-color-main: black;
     --background-color-secondary: rgb(13, 13, 13);
     --background-color-tertiary: lightgray;
     --border-color-main: white ;
     --border-color-secondary: black;
     --border-color-tertiary: rgb(28, 28, 28);
-    --font-color-main: lightgray;
+    --font-color-main: rgb(227, 227, 227);
     --font-color-secondary: rgb(28, 28, 28);
     --font-color-tertiary: black;
 
@@ -13,8 +13,8 @@
     
     background-color: var(--background-color-main);
 }
-a .link {
-  color: rgb(129, 64, 194);
+a {
+  color: rgb(43, 103, 196);
 
 }
 /*
@@ -75,13 +75,16 @@ body {
     background-size: cover;
     background-attachment: fixed;
     background-repeat: no-repeat;
-    display: grid;
-    grid-auto-rows: minmax(50px 1200px);
     align-items: center;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
 }
 
 .header {
     display: flex;
+    width: 100%;
     justify-content: space-between;
     background-color: var(--background-color-main);
     /* background-color: var(--background-color-main); */
@@ -95,6 +98,7 @@ body {
   min-width: 15em;
   height: auto;
   display: inline-block;
+  padding: 1em;
 }
 
 .main-nav {
@@ -128,19 +132,28 @@ body {
   grid-row-start: 4;
 }
 .content {
-  justify-self: center;
   display: flex;
   flex-direction: column;
   grid-row-start: 3;
-  align-items: start;
+  align-items: center;
   padding: 1em;
   justify-content: center;
+  max-width: 75em;
+  align-self: center;
 }
 
-.card {
+
+.section {
+
   overflow: hidden;
   border: 1px solid var(--border-color-tertiary);
   border-radius: 8px;
   padding: 1em;
   background-color: var(--background-color-secondary);
+  display: flex;
+  flex-direction: column;
+  margin-top: 1em;
+  opacity: .9;
+  width: 100%;
+  max-width: 75em;
 }

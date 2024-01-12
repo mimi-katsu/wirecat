@@ -48,12 +48,13 @@ def home():
         best = catlib.deserialize_posts(best)
 
     if not featured:
-        featured = Post.query.filter_by(featured=True).limit(5)
+        current_app.logger.info('DBQUERY: Featured Posts: CACHE')
+        featured = Post.query.filter_by(featured=True)
         to_cache = catlib.serialize_posts(featured)
         cache.set('featured', to_cache)
 
     if not latest:
-        latest = Post.query.order_by(Post.publish_date).limit(5)
+        latest = Post.query.order_by(Post.publish_date.asc()).limit(5)
         to_cache = catlib.serialize_posts(latest)
         cache.set('latest', to_cache)
 
@@ -98,6 +99,8 @@ def blog():
 @wc.route('/post/<post_slug>')
 def blog_post(post_slug):
     post = get_post(post_slug)
+    if not post:
+        abort(404)
     return render_template('post.html', post=post)
 
 @wc.route('/login')
@@ -106,13 +109,15 @@ def login():
 
 def get_post(url_slug):
     p = Post.query.options(joinedload(Post.author)).filter_by(slug=url_slug).first()
-    if not p.meta:
-        meta = PostMeta(post_id=p.id)
-        db.session.add(meta)
+    if p:
+        if not p.meta:
+            meta = PostMeta(post_id=p.id)
+            db.session.add(meta)
+            db.session.commit()
+        p.meta.views += 1
         db.session.commit()
-    p.meta.views += 1
-    db.session.commit()
-    return p
+        return p
+    return None
 
 @wc.context_processor
 def check_login():
