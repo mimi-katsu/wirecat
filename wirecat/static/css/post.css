@@ -26,6 +26,7 @@
     flex-direction: column;
     margin: 2em;
     max-width: 100%;
+    align-items: center;
 }
 
 .image-container img {
@@ -69,4 +70,20 @@ p {
     width: 100%;
     display: flex;
     justify-content: end;
+}
+
+.section p {
+    flex-wrap: wrap;
+    align-self: center;
+}
+
+.section h2 {
+    width: 100%;
+    border-bottom: 2px solid var(--border-color-tertiary);
+    padding: 1em;
+    margin-bottom: 1em;
+}
+
+li {
+    max-width: 45em;
 }
