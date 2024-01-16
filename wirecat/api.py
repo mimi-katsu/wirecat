@@ -237,7 +237,7 @@ def add_to_featured(post_slug):
 
             # Update featured post cache
             cache = current_app.cache
-            featured = Post.query.order_by(Post.publish_date).limit(5)
+            featured = Post.query.filter_by(featured=True).asc().limit(5)
             to_cache = catlib.serialize_posts(featured)
             cache.set('featured', to_cache)
 

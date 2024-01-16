@@ -53,7 +53,7 @@ def home():
         cache.set('featured', to_cache)
 
     if not latest:
-        latest = Post.query.order_by(Post.publish_date.asc()).limit(5)
+        latest = Post.query.order_by(Post.publish_date.desc()).limit(5)
         to_cache = catlib.serialize_posts(latest)
         cache.set('latest', to_cache)
 
