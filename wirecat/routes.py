@@ -14,9 +14,8 @@ Sections:
 import os
 from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint, abort, current_app
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, jwt_required
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, jwt_required, get_jwt
 from flask_jwt_extended.exceptions import NoAuthorizationError
-from sqlalchemy.sql import func
 from sqlalchemy.orm import joinedload
 from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile
 from wirecat.util.w_secrets import Secrets
@@ -122,8 +121,10 @@ def get_post(url_slug):
 @wc.context_processor
 def check_login():
     verify_jwt_in_request(optional=True)
-    current_user = get_jwt_identity()
+    token_values = get_jwt()
     login_status = {'logged_in': False}
-    if current_user:
-        login_status=  {'logged_in':True}
+    user = token_values.get('sub')
+    if user:
+        auth_level = token_values.get('auth_level')
+        login_status=  {'logged_in':True, 'auth_level': auth_level}
     return login_status

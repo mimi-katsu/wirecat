@@ -2,8 +2,6 @@
 .post-head {
     display: flex;
     justify-content: space-between;
-    padding-bottom: 2em;
-    margin-bottom: 2em;
 }
 
 .post-content {
@@ -50,6 +48,7 @@
     border-bottom: 2px solid var(--border-color-tertiary);
     padding-bottom: 2em;
     justify-content: start;
+    align-items: center;
 }
 
 .post-info-text {
@@ -73,7 +72,7 @@
     justify-content: end;
 }
 
-.section p {
+.section p, .post-head p{
     flex-wrap: wrap;
     align-self: center;
     margin: 1em;
@@ -119,4 +118,10 @@ li {
     margin: 1em;
     grid-column-start: 2;
     grid-column-end: 3;
+}
+
+.post-stats {
+    justify-content: space-around;
+    display: flex;
+    flex-wrap: wrap;
 }

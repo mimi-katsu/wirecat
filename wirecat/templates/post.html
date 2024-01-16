@@ -5,6 +5,27 @@
 {% endblock %}
 
 {% block content %}
+{% if logged_in %}
+    {% if auth_level == 'superadmin' %}        
+        <div class="section">
+            <h2>Stats for Admins</h2>
+
+            <div class="post-stats">
+            <p>id: {{post.id}}</p>
+            <p>post_id: {{post.post_id}}</p>
+            <p>Featured: {{post.featured}}</p>
+            <p>published: {{post.published}}</p>
+            <p>author: {{post.author}}</p>
+            <p>author_id: {{post.author.id}}</p>
+            
+            <p>Upvotes: {{post.meta.upvotes}}</p>
+            <p>Favorites: {{post.meta.favorites}}</p>
+            <p>Views: {{post.meta.views}} </p>
+
+            </div>
+    </div>
+    {% endif %}
+{% endif %}
     <div class="post-head">
             <div class="post-info">
                 <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
@@ -19,7 +40,7 @@
                 </div> -->
             </div>
             <p class="post-summary">{{post.summary}}</p>
-            <p class="post-stats">Views: {{post.meta.views}} Favorites: {{post.meta.favorites}} Upvotes: {{post.meta.upvotes}}</p>
+
     </div>
 
          {{post.html_content | safe}}

@@ -8,7 +8,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
 from db import User
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, joinedload
 from sqlalchemy import Integer, String
 
 wc_auth = Blueprint('wc_auth_auth', __name__, url_prefix='/auth')
@@ -21,7 +21,7 @@ def login_api():
         # get client credentials from http post form
         username = request.form.get('username', None)
         password = request.form.get('password', None)
-        req_type = request.form.get('request_type', None)
+        # req_type = request.form.get('request_type', None)
             
         # pull user information from database
         if username and password:
@@ -37,9 +37,11 @@ def login_api():
         valid = check_password_hash(user.password, password)
 
         if valid:
-            # create jwt token and set as cookie in client browser
+            # create jwt token, add permission level, and set as cookie in client browser.
             expiry = datetime.timedelta(hours=12)
-            token = create_access_token(identity=username, expires_delta=expiry)
+            perm = {'auth_level':user.perm}
+
+            token = create_access_token(identity=username, expires_delta=expiry, additional_claims=perm)
             response = make_response(redirect(url_for('wirecat.dashboard')))
             set_access_cookies(response, token)
             return response
@@ -58,7 +60,8 @@ def verify():
     if not token:
         return render_template('login.html')
     current_user = get_jwt_identity()
-    return jsonify(logged_in=True, user = current_user)
+    user = User.query.options(joinedload(User.profile)).filter_by(username=current_user).first()
+    return jsonify(logged_in=True, user = user.username, auth_level=user.perm)
     #TODO
     #Verify requests that use HMAC and not an api key
     # return 'Success', 200
