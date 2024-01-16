@@ -4,24 +4,30 @@
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="/static/css/login.html">
+<link rel="stylesheet" href="/static/css/login.css">
 {% endblock %}
 
 {% block content %}
-<form action="auth/login" method="POST">
-    <label for="username-box">Username</label>
-    <input type="text" id="username-box" name="username" required>
-    <label for="password-box">Password</label>
-    <input type="password" name="password" id="password-box" required>
-    <button type="submit">Submit</button>
-</form>
-{% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for m in messages %}
-            <p class="message">{{m}}</p>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
+<div class="login-container">
+    <h1>Wirecat is not accepting registrations at this time. Sorry!</h1>
+    <form action="auth/login" method="POST" class="login-form">
+        <div class="input-container">
+            <label for="username-box"></label>
+            <input type="text" id="username-box" name="username" placeholder="Username or email" required>
+        </div>
+        <div class="input-container">
+            <label for="password-box"></label>
+            <input type="password" name="password" id="password-box" placeholder="Password" required>
+        </div>
+        <button type="submit">Submit</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for m in messages %}
+                <p class="message">{{m}}</p>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+</div>
 
 {% endblock %}

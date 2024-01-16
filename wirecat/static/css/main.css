@@ -133,8 +133,7 @@ body {
 }
 .content {
   grid-row-start: 3;
-  align-items: center;
-  justify-content: center;
+
   width: 100%;
   align-self: center;
   display: grid;

@@ -1,0 +1,30 @@
+
+.login-container {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1em;
+}
+.login-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.login-form>* {
+    margin: 1em;
+}
+h1 {
+    font-size: 1.5em;
+}
+
+button {
+    color: var(--font-color-tertiary);
+}
+
+input {
+    color: black;
+}
+
