@@ -13,8 +13,7 @@ with open('mimi.key', 'r') as key:
     
     p = sys.argv[1]
     
-    print(f'Sending request to feature:\n\n "{p}"')
-    response = requests.get(f'http://127.0.0.1:5001/api/v1/posts/highlight/add/{p}', data=data)
+    print(f'Sending request to unfeature:\n\n "{p}"')
+    response = requests.get(f'http://127.0.0.1:5001/api/v1/posts/highlight/remove/{p}', data=data)
     
     print(response.text)
-    

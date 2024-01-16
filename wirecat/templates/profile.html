@@ -1,10 +1,12 @@
-{% extends 'main.html' %}
+{% extends 'blog.html' %}
 
 {% block css %}
 <link rel="stylesheet" href="/static/css/profile.css">
+<link rel="stylesheet" href="/static/css/post.css">
 {% endblock %}
 
 {% block content %}
+<div class="section">
 <p>{{user.email}}</p>
 <p>{{user.first_name}}</p>
 <p>{{user.last_name}}</p>
@@ -14,8 +16,9 @@
 
 {% if posts %}
     {% for post in posts %}
-        <div>{{post.title}}</div>
+        <a href="/post/{{post.slug}}" class="link">{{post.title}}</a>
 
     {% endfor %}
 {% endif %}
-{% endblock %}
+{% endblock %}    
+</div>

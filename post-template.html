@@ -1,5 +1,5 @@
 <!-- Title of the post-->
-<title><h1>Formatting Test Post 4</h1></title>
+<title><h1>Formatting test with code, subsections, and subtext</h1></title>
 
 <!--Path to the thumbnail pic-->
 <thumbnail><img src='cats5.jpg' class='thumbnail'></thumbnail>
@@ -12,14 +12,41 @@
 <!--Main content of the post. Pics should contain their file path just like the thumbnail -->
 <content>
 <div class="section"> 
-    <h2 class="section">Section 1</h2>   
+    <h2>Section 1</h2>   
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel ligula non massa aliquet malesuada. Pellentesque ultrices facilisis metus, eu consectetur dui. Sed ipsum nunc, sodales ut neque nec, consequat luctus enim. Ut rutrum at purus ut mattis. Ut et posuere libero, quis gravida lectus. Sed sit amet erat purus. Integer nec est pharetra ipsum blandit luctus a eu neque. Nullam semper purus odio, in lacinia leo pharetra sit amet. In felis risus, vulputate sit amet tristique ac, fringilla vitae quam. Curabitur auctor dolor in turpis fringilla, ut condimentum libero varius. Mauris tincidunt libero quam. Aenean eget eleifend tortor, in mattis justo. Aenean rutrum, leo quis euismod porta, nunc lorem ullamcorper orci, nec dignissim sem nisi ac massa. Proin non sem mi. </p>
     <div class="image-container">
         <img src='cats5.jpg' alt='test' class='post-body'>
         <p class="image-text">Image bottom text</p>
     </div>
+    <pre class="code">
+        class User:
+            def __init__(self, user_id=None, username=None, first_name=None, last_name=None, email=None, date_created=None, favorites=[], api_key=None, secret_key=None, password=None):
+                self.user_id:str = user_id
+                self.username:str = username
+                self.first_name:str = first_name
+                self.last_name:str = last_name
+                self.email:str = email
+                self.date_created:str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                self.favorites:list[str] = favorites
+                self.api_key = api_key
+                self.secret_key = secret_key
+                self.password = password
+        
+            def favorites(self):
+                """return a list of posts that the user has "favorited" on the blog"""
+                return
+            def comments(self):
+                """return list of comments that the user has left on blog posts"""
+                return
+            def view_history(self):
+                """return a list of pages visited in chronological order (reverse)"""
+                return
+    </pre>
+    <p class="subtext">This is a test sample of what code and subtext will look like. Subtext has s lightly different styling than normal text and doesnt stand out as much.</p>
+
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel ligula non massa aliquet malesuada. Pellentesque ultrices facilisis metus, eu consectetur dui. Sed ipsum nunc, sodales ut neque nec, consequat luctus enim. Ut rutrum at purus ut mattis. Ut et posuere libero, quis gravida lectus. Sed sit amet erat purus. Integer nec est pharetra ipsum blandit luctus a eu neque. Nullam semper purus odio, in lacinia leo pharetra sit amet. In felis risus, vulputate sit amet tristique ac, fringilla vitae quam. Curabitur auctor dolor in turpis fringilla, ut condimentum libero varius. Mauris tincidunt libero quam. Aenean eget eleifend tortor, in mattis justo. Aenean rutrum, leo quis euismod porta, nunc lorem ullamcorper orci, nec dignissim sem nisi ac massa. Proin non sem mi. </p>
 </div>
+<div class="subsection">Subsection spot. This will be for displaying ads or links to other posts.</div>
 <div class="section"> 
     <h2>Section 2</h2>
     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vel ligula non massa aliquet malesuada. Pellentesque ultrices facilisis metus, eu consectetur dui. Sed ipsum nunc, sodales ut neque nec, consequat luctus enim. Ut rutrum at purus ut mattis. Ut et posuere libero, quis gravida lectus. Sed sit amet erat purus. Integer nec est pharetra ipsum blandit luctus a eu neque. Nullam semper purus odio, in lacinia leo pharetra sit amet. In felis risus, vulputate sit amet tristique ac, fringilla vitae quam. Curabitur auctor dolor in turpis fringilla, ut condimentum libero varius. Mauris tincidunt libero quam. Aenean eget eleifend tortor, in mattis justo. Aenean rutrum, leo quis euismod porta, nunc lorem ullamcorper orci, nec dignissim sem nisi ac massa. Proin non sem mi. </p>
@@ -32,6 +59,7 @@
         <p class="image-text">Image bottom text</p>
     </div>
 </div>
+<div class="subsection">Subsection spot. This will be for displaying ads or links to other posts.</div>
 
 <div class="section">
     <p>Love, Mimi</p>

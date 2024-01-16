@@ -28,13 +28,16 @@
                 {% endif %}       
         </div>
     </div>
-    {% block nav %}{% endblock %}
+
+    <div class="nav">{% block nav %}{% endblock %}</div>
+    <div class="announcement-bar">
+        <p>This is an announcement</p>
+    </div>
+
     <div class="content">
         {% block content %}{% endblock %}
-        <div class="side-left"></div>
-        <div class="side-right"></div>
-
     </div>
+
     <div class="footer">
         {% include 'footer.html' %}
     </div>

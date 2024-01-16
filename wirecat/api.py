@@ -126,7 +126,7 @@ def add_post():
 
                 # Update latest post cache
                 cache = current_app.cache
-                latest = Post.query.order_by(Post.publish_date).limit(5)
+                latest = Post.query.order_by(Post.publish_date.desc()).limit(5)
                 to_cache = catlib.serialize_posts(latest)
                 cache.set('latest', to_cache)
 
@@ -205,7 +205,7 @@ def update_posts():
         # wirecat.posts.update(wirecat.db.get_recent_posts())
         return 'posts updated', 200
 
-@wc_api.route('/api/v1/posts/highlight/<post_slug>')
+@wc_api.route('/api/v1/posts/highlight/add/<post_slug>')
 def add_to_featured(post_slug):
     try:
         response = None
@@ -253,8 +253,50 @@ def add_to_featured(post_slug):
             response = jsonify(error="Something unexpected happened")
         return response
     
-@wc_api.route('/api/v1/posts/highlight/add')
+@wc_api.route('/api/v1/posts/highlight/remove/<post_slug>')
+def remove_from_featured(post_slug):
+    try:
+        response = None
+        key = request.form.get('key', None)
+        api_user = request.form.get('username', None)
+        
+        if not api_user and key:
+            raise InvalidCredentials
 
-@wc_api.route('/api/v1/posts/highlight/remove')
-def remove_post():
-    return
+        if key and api_user:
+            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+            if user.perm != 'superadmin':
+                raise InvalidCredentials
+        if not user and user.api_key:
+            raise InvalidCredentials
+        # match password hashes
+        valid = check_password_hash(user.keys.key, key)
+
+        if not valid:
+            raise InvalidCredentials
+        
+        if valid:
+            post = Post.query.filter_by(slug=post_slug).first()
+            if not post:
+                raise DoesNotExist
+            
+            post.featured = False
+            db.session.commit()
+
+            # Update featured post cache
+            cache = current_app.cache
+            featured = Post.query.order_by(Post.publish_date).limit(5)
+            to_cache = catlib.serialize_posts(featured)
+            cache.set('featured', to_cache)
+
+            response = jsonify(type='unfeature', success=True, msg='Post was successfully unfeatured'), 200
+
+    except InvalidCredentials as e:
+        response = jsonify(type='unfeature', success=False, msg=f'{e}'), 200
+
+    except DoesNotExist as e:
+        repsonse = jsonify(type='unfeature', success=False, msg=f'{e}'), 200
+    finally:
+        if not response:
+            response = jsonify(error="Something unexpected happened")
+        return response
