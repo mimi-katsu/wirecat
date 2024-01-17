@@ -48,12 +48,15 @@ def home():
 
     if not featured:
         current_app.logger.info('DBQUERY: Featured Posts: CACHE')
-        featured = Post.query.filter_by(featured=True)
+        featured = Post.query.filter_by(featured=True, published=True).all()
         to_cache = catlib.serialize_posts(featured)
         cache.set('featured', to_cache)
 
     if not latest:
-        latest = Post.query.order_by(Post.publish_date.desc()).limit(5)
+        latest = Post.query.order_by(Post.publish_date.desc()) \
+        .filter_by(published=True) \
+        .limit(5) \
+        .all()
         to_cache = catlib.serialize_posts(latest)
         cache.set('latest', to_cache)
 

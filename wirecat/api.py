@@ -221,9 +221,103 @@ def delete_post(id_type, target):
             response = jsonify(error="Something unexpected happened")
         return response
 
-@wc_api.route('/api/v1/posts/unpublish')
+@wc_api.route('/api/v1/posts/publish/<id_type>/<target>',methods=['GET','POST'])
+def publish(id_type, target):
+    try:
+        response = None
+        key = request.form.get('key', None)
+        api_user = request.form.get('username', None)
+        if not api_user and key:
+            raise InvalidCredentials
 
-@wc_api.route('/api/v1/posts/edit')
+        if key and api_user:
+            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        
+        if user and user.perm not in can_highlight:
+            raise InvalidCredentials
+
+        if not user.keys.key:
+            raise InvalidCredentials
+        # match password hashes
+        valid = check_password_hash(user.keys.key, key)
+        if not valid:
+            raise InvalidCredentials
+        if id_type == 'slug':
+            post = Post.query.filter_by(slug=target).first()
+        if id_type == 'id':
+            post = Post.query.filter_by(id=target).first()
+
+        if not post:
+            raise DoesNotExist
+
+        post.published = True
+        db.session.commit()
+
+        response = jsonify(type='publish', success=True, msg='Post was successfully published'), 200
+
+    except InvalidCredentials as e:
+        db.session.rollback()
+        response = jsonify(type='publish', success=False, msg=f'{e}'), 200
+    except Exception as e:
+        db.session.rollback()
+        response = jsonify(type='publish', success=False, msg=f'{e}'), 200
+    except DoesNotExist as e:
+        db.session.rollback()
+        response = jsonify(type='publish', success=False, msg=f'{e}'), 200
+    finally:
+        if not response:
+            response = jsonify(error="Something unexpected happened")
+        return response
+
+@wc_api.route('/api/v1/posts/hide/<id_type>/<target>',methods=['GET','POST'])
+def hide(id_type, target):
+    try:
+        response = None
+        key = request.form.get('key', None)
+        api_user = request.form.get('username', None)
+        if not api_user and key:
+            raise InvalidCredentials
+
+        if key and api_user:
+            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        
+        if user and user.perm not in can_highlight:
+            raise InvalidCredentials
+
+        if not user.keys.key:
+            raise InvalidCredentials
+        # match password hashes
+        valid = check_password_hash(user.keys.key, key)
+        if not valid:
+            raise InvalidCredentials
+
+        if id_type == 'slug':
+            post = Post.query.filter_by(slug=target).first()
+        if id_type == 'id':
+            post = Post.query.filter_by(id=target).first()
+
+        if not post:
+            raise DoesNotExist
+
+        post.published = False
+        db.session.commit()
+
+        response = jsonify(type='hide', success=True, msg='Post was successfully hidden'), 200
+
+    except InvalidCredentials as e:
+        db.session.rollback()
+        response = jsonify(type='hide', success=False, msg=f'{e}'), 200
+    except Exception as e:
+        db.session.rollback()
+        response = jsonify(type='hide', success=False, msg=f'{e}'), 200
+    except DoesNotExist as e:
+        db.session.rollback()
+        response = jsonify(type='hide', success=False, msg=f'{e}'), 200
+    finally:
+        if not response:
+            response = jsonify(error="Something unexpected happened")
+        return response
+# @wc_api.route('/api/v1/posts/edit')
 
 @wc_api.route('/api/v1/posts/update')
 def update_posts():
@@ -236,7 +330,7 @@ def update_posts():
         return 'posts updated', 200
 
 @wc_api.route('/api/v1/posts/highlight/add/<id_type>/<target>')
-def add_to_featured(id_type, target):
+def highlight(id_type, target):
     try:
         response = None
         key = request.form.get('key', None)
@@ -287,7 +381,7 @@ def add_to_featured(id_type, target):
         return response
   
 @wc_api.route('/api/v1/posts/highlight/remove/<id_type>/<target>')
-def remove_from_featured(id_type, target):
+def unhighlight(id_type, target):
     try:
         response = None
         key = request.form.get('key', None)

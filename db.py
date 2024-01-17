@@ -17,6 +17,7 @@ class Post(db.Model):
     summary:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     thumbnail:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     publish_date:Mapped[str] = mapped_column(String, unique=False, nullable=False)
+    published:Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     featured:Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     author = relationship('User', backref='post')
 

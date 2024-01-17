@@ -17,13 +17,13 @@ def create_parser():
     parser = argparse.ArgumentParser(description="Client for interacting with the wirecat api.")
 
     parser.add_argument("method", type=str, help="The type of action to take. ['post', 'delete', 'highlight', 'unhighlight','publish','hide','flush','ban','unban']")
-    parser.add_argument("-u", type=str, help="Username to authenticate with")
-    parser.add_argument("-k", type=str, help="Path to api key to authenticate with")
+    parser.add_argument("--host", type=str, help="Host domain or ip address", required=True)
+    parser.add_argument("-u", type=str, help="Username to authenticate with", required=True)
+    parser.add_argument("-k", type=str, help="Path to api key to authenticate with", required=True)
     parser.add_argument("-p", type=str, help="Display prompt to enter your password for authentication")
     parser.add_argument("--id", type=str, help="Identify target post or user by id")
     parser.add_argument("--name", type=str, help="Identify target post or user by name (url slug or user name)")
     parser.add_argument("-f", type=str, help="HTML file path to upload as a post.")
-
     return parser
 
 def post(args):
@@ -153,10 +153,75 @@ def unhighlight(args):
             print(f'''Type: {r['type']}''')
             print('\n\n')
 
-# def publish(args):
-# 
-# def hide(args):
-# 
+def publish(args):
+    if not args.u:
+        print("Please specify a username to authenticate as")
+        return
+
+    if not args.k:
+        print("Please specify your password or api key")
+        return
+
+    if args.name:
+        id_type = 'slug'
+        target = args.name
+
+    if args.id:
+        id_type = 'id'
+        target = args.id
+
+    data = {'username': args.u}
+
+    if args.k:
+        with open(f'{args.k}', 'r') as key:
+            data['key'] = key
+            print(f'Sending request to highlight:\n\n "{target}"\n\n')
+            response = requests.get(f'http://127.0.0.1:5001/api/v1/posts/publish/{id_type}/{target}', data=data)
+            # print(response.text)
+            try:
+                r = json.loads(response.text)
+            except json.JSONDecodeError:
+                print("Unexpected response from server")
+                exit()
+            print(f'''Status: {r['success']}''')
+            print(f'''Message: {r['msg']}''')
+            print(f'''Type: {r['type']}''')
+            print('\n\n')
+
+def hide(args):
+    if not args.u:
+        print("Please specify a username to authenticate as")
+        return
+
+    if not args.k:
+        print("Please specify your password or api key")
+        return
+
+    if args.name:
+        id_type = 'slug'
+        target = args.name
+
+    if args.id:
+        id_type = 'id'
+        target = args.id
+
+    data = {'username': args.u}
+
+    if args.k:
+        with open(f'{args.k}', 'r') as key:
+            data['key'] = key
+            print(f'Sending request to highlight:\n\n "{target}"\n\n')
+            response = requests.get(f'http://127.0.0.1:5001/api/v1/posts/hide/{id_type}/{target}', data=data)
+            # print(response.text)
+            try:
+                r = json.loads(response.text)
+            except json.JSONDecodeError:
+                print("Unexpected response from server")
+                exit()
+            print(f'''Status: {r['success']}''')
+            print(f'''Message: {r['msg']}''')
+            print(f'''Type: {r['type']}''')
+            print('\n\n')
 def delete(args):
     if not args.u:
         print("Please specify a username to authenticate as")
@@ -204,15 +269,14 @@ def delete(args):
 # 
 # 
 
-
 def create_options():
     return {
         'post': Option(post, "The path to the post's html document"),
         'delete': Option(delete, "Delete a post completely. This removes its contents from the database as well."),
         'highlight': Option(highlight, "Add a post to the featured category"),
-        'unhighlight': Option(unhighlight, "Remove a post from the featured category")
-        # 'publish': Option(publish, "Make a post visible to all users on the site"),
-        # 'hide': Option(hide, "Make a post visible only to it's author and admins"),
+        'unhighlight': Option(unhighlight, "Remove a post from the featured category"),
+        'publish': Option(publish, "Make a post visible to all users on the site"),
+        'hide': Option(hide, "Make a post visible only to it's author and admins")
         # 'flush': Option(flush, "flush out the site caches"),
         # 'ban': Option(ban,"Ban a users account"),
         # 'unban': Option(unban, "Unban a users account")
