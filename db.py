@@ -83,7 +83,7 @@ class ApiKeys(db.Model):
     id:Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id:Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), unique = True, nullable=True)
     key:Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    expires:Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    expires:Mapped[str] = mapped_column(String, unique=False, nullable=False)
     user = relationship('User', backref=backref('keys', uselist=False))
     def __repr__(self):
         return f'{self.user_id}'

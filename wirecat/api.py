@@ -19,6 +19,15 @@ from wirecat.app import db
 
 wc_api = Blueprint('api', __name__)
 
+can_post = ['superadmin', 'admin', 'author']
+see_own_stats = ['superadmin', 'admin', 'author']
+see_all_stats = ['superadmin', 'admin']
+can_create_post= ['superadmin', 'admin', 'author']
+can_publish = ['superadmin', 'admin']
+can_delete = ['superadmin']
+can_highlight = ['superadmin']
+
+
 class InvalidPost(Exception):
     def __str__(self):
         return "Post Failed Validation."
@@ -42,97 +51,109 @@ def v1_help():
     #   return some json providing a top level overview of the api and how to use it
         return render_template('api-help.html')
 
-@wc_api.route('/api/v1/posts/get')
-def get_posts():
-    posts = Post.query.all()
-    #TODO:
-    #   return json explaining how to auth and which child routes are available
-    return redirect(url_for('wirecat.home')), 200
+# @wc_api.route('/api/v1/posts/get')
+# def get_posts():
+#     posts = Post.query.all()
+#     #TODO:
+#     #   return json explaining how to auth and which child routes are available
+#     return redirect(url_for('wirecat.home')), 200
 
 @wc_api.route('/api/v1/posts/add', methods=['GET','POST'])
 def add_post():
+    print('adding post')
     if request.method == 'GET':
         return jsonify(error="Invalid method"), 200
 
     if request.method == 'POST':
         try:
             response = None
+
             key = request.form.get('key', None)
             api_user = request.form.get('username', None)
+
+            #check if form contains required data
             if not api_user and key:
                 raise InvalidCredentials
 
-            if key and api_user:
-                user = User.query.options(joinedload(User.keys), joinedload(User.profile)).filter_by(username=api_user).first()
-                # user_key = ApiKeys.query.filter_by(user_id = user.id).first()
+            #make database query
+            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+
+            #check for existence of api key
             if not user and user.keys.key:
                 raise InvalidCredentials
-            # match password hashes
+
+            # check user access level
+            if user.perm not in can_post:
+                raise InvalidCredentials
+
+            # match key hashes
             valid = check_password_hash(user.keys.key, key)
             if not valid:
                 raise InvalidCredentials
 
-            if valid:
-                # initialize some useful values
-                now = datetime.now()
-                # generate the realative path for the image 'src' attributes to use
-                path = catlib.html_image_path()
+            # initialize some useful values
+            now = datetime.now()
 
-                # create url slug from title
-                slug = catlib.generate_slug(request.form.get('title', None))
+            # generate the relative path for the image 'src' attributes to use
+            path = catlib.html_image_path()
 
-                # TODO:
-                # Incorporate post ids with post files so that same named files wont overwrite eachother when uploaded
-                post_id = catlib.generate_id()
-                # validate and post contents. returns true if okay. Raise error if bad
-                if not catlib.verify_post(request):
-                    raise InvalidPost
+            # create url slug from title
+            slug = catlib.generate_slug(request.form.get('title', None))
 
-                # Save the included files in a directory structure based on the date (YYYY/MM/DD)
-                for f in request.files:
-                    file = request.files[f]
-                    if file:
-                        filename = secure_filename(file.filename)
-                        #file save path is the absolute path for the file on the server
-                        file.save(f'{catlib.file_save_path()}/{post_id}-{filename}')
-                # modify the image paths of the included html content and thumbnail to use the servers directory structure
-                content_soup = BeautifulSoup(request.form.get('html_content', None), 'html.parser')
+            post_id = catlib.generate_id()
 
-                images = content_soup.find_all('img')
-                # replace image source with the relative path of the image file in servers storage
-                for i in images:
-                    i['src'] = f'{path}/{post_id}-{i["src"]}'
-                modified_html_content = str(content_soup)
-                # Create SQLAlchemy object and push it to the database
+            # validate and post contents. returns true if okay. Raise error if bad
+            # TODO:
+            # This function doesn nothing at the moment. In the future it should sanitize the
+            # post contents and verify the necessary fileds exist
+            if not catlib.verify_post(request):
+                raise InvalidPost
 
-                post = Post(
-                    title=request.form.get('title', None),
-                    user_id = user.id,
-                    post_id = post_id,
-                    slug=slug,
-                    html_content=modified_html_content,
-                    summary=request.form.get('summary', None),
-                    publish_date=f'{now.year}/{now.month}/{now.day}'
-                    )
-                
-                if request.form.get('thumbnail', None):
-                    post.thumbnail = f'{post_id}-{request.form.get("thumbnail")}'
-                db.session.add(post)
-                db.session.commit()
-                #TODO:
-                # Make sure that post files and database contents are both 
-                # removed in the event that one or the other fails
+            # Save the included files in a directory structure based on the date (YYYY/MM/DD)
+            for f in request.files:
+                file = request.files[f]
+                if file:
+                    filename = secure_filename(file.filename)
+                    #file save path is the absolute path for the file on the server
+                    file.save(f'{catlib.file_save_path()}/{post_id}-{filename}')
+
+            # modify the image paths of the included html content and thumbnail to use the servers directory structure
+            content_soup = BeautifulSoup(request.form.get('html_content', None), 'html.parser')
+            images = content_soup.find_all('img')
+            # replace image source with the relative path of the image file in servers storage
+            for i in images:
+                i['src'] = f'{path}/{post_id}-{i["src"]}'
+            modified_html_content = str(content_soup)
+            # Create SQLAlchemy object and push it to the database
+
+            post = Post(
+                title=request.form.get('title', None),
+                user_id = user.id,
+                post_id = post_id,
+                slug=slug,
+                html_content=modified_html_content,
+                summary=request.form.get('summary', None),
+                publish_date=f'{now.year}/{now.month}/{now.day}'
+                )
+            
+            if request.form.get('thumbnail', None):
+                post.thumbnail = f'{post_id}-{request.form.get("thumbnail")}'
+            
+            db.session.add(post)
+            db.session.commit()
+            #TODO:
+            # Make sure that post files and database contents are both 
+            # removed in the event that one or the other fails
 
 
-                # Update latest post cache
-                cache = current_app.cache
-                latest = Post.query.order_by(Post.publish_date.desc()).limit(5)
-                to_cache = catlib.serialize_posts(latest)
-                cache.set('latest', to_cache)
+            # Update latest post cache
+            cache = current_app.cache
+            latest = Post.query.order_by(Post.publish_date.desc()).limit(5)
+            to_cache = catlib.serialize_posts(latest)
+            cache.set('latest', to_cache)
 
-                response = jsonify(type='post', success=True, msg='Post was successfully uploaded'), 200
-            else:
-                response = jsonify(type='post', success=False, msg='Post was invalidated')
+            response = jsonify(type='post', success=True, msg='Post was successfully uploaded'), 200
+
         except IntegrityError as e:
             response = jsonify(type='post', success=False, msg=f'{str(e.orig)}'), 200
         
@@ -141,55 +162,64 @@ def add_post():
         
         except InvalidCredentials as e:
             response = jsonify(type='post', success=False, msg=f'{e}'), 200
-
+        except Exception as e:
+            response = jsonify(type='feature', success=False, msg=f'{e}'), 200
         finally:
             if not response:
                 response = jsonify(error='Something Unexpected occured')
             return response
 
-@wc_api.route('/api/v1/posts/delete/<post_id>', methods=['GET','POST'])
-def delete(post_id):
-    if request.method == 'GET':
-        return jsonify(error="Invalid method"), 200
+@wc_api.route('/api/v1/posts/delete/<id_type>/<target>', methods=['GET','DELETE'])
+def delete_post(id_type, target):
+    if request.method != 'DELETE':
+        return jsonify(type='delete', success=False, msg='Invalid Method'), 200
+    try:
+        response = None
+        key = request.form.get('key', None)
+        api_user = request.form.get('username', None)
+        if not api_user and key:
+            raise InvalidCredentials
 
-    if request.method == 'POST':
-        try:
-            response = None
-            key = request.form.get('key', None)
-            api_user = request.form.get('username', None)
-            
-            if not api_user and key:
-                raise InvalidCredentials
+        if key and api_user:
+            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        
+        if user and user.perm not in can_delete:
+            raise InvalidCredentials
 
-            if key and api_user:
-                user = User.query.filter_by(username=api_user).first()
+        if not user.keys.key:
+            raise InvalidCredentials
+        # match password hashes
+        valid = check_password_hash(user.keys.key, key)
+        if not valid:
+            raise InvalidCredentials
 
-            if not user and user.api_key:
-                raise InvalidCredentials
-            # match password hashes
-            valid = check_password_hash(user.api_key, key)
+        if id_type == 'slug':
+            post = Post.query.filter_by(slug=target).first()
+        if id_type == 'id':
+            post = Post.query.filter_by(id=target).first()
 
-            if not valid:
-                raise InvalidCredentials
+        if not post:
+            raise DoesNotExist
 
-            if valid:
-                post = Post.query.get(post_id)
-                # if not post:
-                #     raise DoesNotExist
-                db.session.delete(post)
-                db.session.commit()
+        meta = PostMeta.query.filter_by(post_id=post.id).first()
+        db.session.delete(meta)
+        db.session.delete(post)
+        db.session.commit()
 
-                response = jsonify(type='delete', success=True, msg='Post was successfully deleted'), 200
+        response = jsonify(type='delete', success=True, msg='Post was successfully deleted'), 200
 
-        except InvalidCredentials as e:
-            response = jsonify(type='delete', success=False, msg=f'{e}'), 200
+    except InvalidCredentials as e:
+        response = jsonify(type='delete', success=False, msg=f'{e}'), 200
 
-        except DoesNotExist as e:
-            repsonse = jsonify(type='delete', success=False, msg=f'{e}'), 200
-        finally:
-            if not response:
-                response = jsonify(error="Something unexpected happened")
-            return response
+    except DoesNotExist as e:
+        response = jsonify(type='delete', success=False, msg=f'{e}'), 200
+        
+    except Exception as e:
+        response = jsonify(type='feature', success=False, msg=f'{e}'), 200
+    finally:
+        if not response:
+            response = jsonify(error="Something unexpected happened")
+        return response
 
 @wc_api.route('/api/v1/posts/unpublish')
 
@@ -205,97 +235,104 @@ def update_posts():
         # wirecat.posts.update(wirecat.db.get_recent_posts())
         return 'posts updated', 200
 
-@wc_api.route('/api/v1/posts/highlight/add/<post_slug>')
-def add_to_featured(post_slug):
+@wc_api.route('/api/v1/posts/highlight/add/<id_type>/<target>')
+def add_to_featured(id_type, target):
     try:
         response = None
         key = request.form.get('key', None)
         api_user = request.form.get('username', None)
-        
         if not api_user and key:
             raise InvalidCredentials
 
         if key and api_user:
             user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
-            if user.perm != 'superadmin':
-                raise InvalidCredentials
-        if not user and user.api_key:
+        
+        if user and user.perm not in can_highlight:
+            raise InvalidCredentials
+
+        if not user.keys.key:
             raise InvalidCredentials
         # match password hashes
         valid = check_password_hash(user.keys.key, key)
-
         if not valid:
             raise InvalidCredentials
-        
-        if valid:
-            post = Post.query.filter_by(slug=post_slug).first()
-            if not post:
-                raise DoesNotExist
-            
-            post.featured = True
-            db.session.commit()
+        if id_type == 'slug':
+            post = Post.query.filter_by(slug=target).first()
+        if id_type == 'id':
+            post = Post.query.filter_by(id=target).first()
 
-            # Update featured post cache
-            cache = current_app.cache
-            featured = Post.query.filter_by(featured=True).asc().limit(5)
-            to_cache = catlib.serialize_posts(featured)
-            cache.set('featured', to_cache)
+        if not post:
+            raise DoesNotExist
 
-            response = jsonify(type='feature', success=True, msg='Post was successfully featured'), 200
+        post.featured = True
+        db.session.commit()
+
+        # Update featured post cache
+        cache = current_app.cache
+        featured = Post.query.filter_by(featured=True).limit(5)
+        to_cache = catlib.serialize_posts(featured)
+        cache.set('featured', to_cache)
+
+        response = jsonify(type='feature', success=True, msg='Post was successfully featured'), 200
 
     except InvalidCredentials as e:
         response = jsonify(type='feature', success=False, msg=f'{e}'), 200
-
+    except Exception as e:
+        response = jsonify(type='feature', success=False, msg=f'{e}'), 200
     except DoesNotExist as e:
-        repsonse = jsonify(type='feature', success=False, msg=f'{e}'), 200
+        response = jsonify(type='feature', success=False, msg=f'{e}'), 200
     finally:
         if not response:
             response = jsonify(error="Something unexpected happened")
         return response
-    
-@wc_api.route('/api/v1/posts/highlight/remove/<post_slug>')
-def remove_from_featured(post_slug):
+  
+@wc_api.route('/api/v1/posts/highlight/remove/<id_type>/<target>')
+def remove_from_featured(id_type, target):
     try:
         response = None
         key = request.form.get('key', None)
         api_user = request.form.get('username', None)
-        
         if not api_user and key:
             raise InvalidCredentials
 
         if key and api_user:
             user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
-            if user.perm != 'superadmin':
-                raise InvalidCredentials
-        if not user and user.api_key:
+        
+        if user and user.perm not in can_highlight:
+            raise InvalidCredentials
+
+        if not user.keys.key:
             raise InvalidCredentials
         # match password hashes
         valid = check_password_hash(user.keys.key, key)
-
         if not valid:
             raise InvalidCredentials
-        
-        if valid:
-            post = Post.query.filter_by(slug=post_slug).first()
-            if not post:
-                raise DoesNotExist
-            
-            post.featured = False
-            db.session.commit()
 
-            # Update featured post cache
-            cache = current_app.cache
-            featured = Post.query.order_by(Post.publish_date).limit(5)
-            to_cache = catlib.serialize_posts(featured)
-            cache.set('featured', to_cache)
+        if id_type == 'slug':
+            post = Post.query.filter_by(slug=target).first()
+        if id_type == 'id':
+            post = Post.query.filter_by(id=target).first()
 
-            response = jsonify(type='unfeature', success=True, msg='Post was successfully unfeatured'), 200
+        if not post:
+            raise DoesNotExist
+
+        post.featured = False
+        db.session.commit()
+
+        # Update featured post cache
+        cache = current_app.cache
+        featured = Post.query.filter_by(featured=True).limit(5)
+        to_cache = catlib.serialize_posts(featured)
+        cache.set('featured', to_cache)
+
+        response = jsonify(type='unfeature', success=True, msg='Post was successfully removed from featured list'), 200
 
     except InvalidCredentials as e:
-        response = jsonify(type='unfeature', success=False, msg=f'{e}'), 200
-
+        response = jsonify(type='feature', success=False, msg=f'{e}'), 200
+    except Exception as e:
+        response = jsonify(type='feature', success=False, msg=f'{e}'), 200
     except DoesNotExist as e:
-        repsonse = jsonify(type='unfeature', success=False, msg=f'{e}'), 200
+        response = jsonify(type='feature', success=False, msg=f'{e}'), 200
     finally:
         if not response:
             response = jsonify(error="Something unexpected happened")
