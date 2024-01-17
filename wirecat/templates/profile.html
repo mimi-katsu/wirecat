@@ -2,7 +2,6 @@
 
 {% block css %}
 <link rel="stylesheet" href="/static/css/profile.css">
-<link rel="stylesheet" href="/static/css/post.css">
 {% endblock %}
 
 {% block content %}
@@ -13,12 +12,19 @@
 <p>{{user.profile.about}}</p>
 <p>{{user.profile.gender}}</p>
 <p>{{user.profile.dob}}</p>
+</div>
 
 {% if posts %}
     {% for post in posts %}
-        <a href="/post/{{post.slug}}" class="link">{{post.title}}</a>
-
+    <div class="section">
+        <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
+        <div class="post-info">
+            <a href="/post/{{post.slug}}" class="link">{{post.title}}</a>
+            <p>{{post.publish_date}}</p>
+            <p>{{post.summary}}</p>
+        </div>
+    </div>
     {% endfor %}
 {% endif %}
 {% endblock %}    
-</div>
+

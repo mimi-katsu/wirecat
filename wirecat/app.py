@@ -54,7 +54,6 @@ def create_app(test_config=None):
             newkey = ApiKeys(user_id = user.id, key = generate_password_hash(mimi_key, method='pbkdf2:sha256'), expires='never')
             db.session.add(newkey)
             db.session.commit()
-            key = ApiKeys.query.filter_by(user_id = user.id).first()
             with open('./mimi.key', 'w') as f:
                 f.write(mimi_key)
         except IntegrityError:
@@ -64,7 +63,6 @@ def create_app(test_config=None):
     # Set custom 404 template
     @app.errorhandler(404)
     def page_not_found(e):
-        # Note that we set the 404 status explicitly
         return render_template('404.html'), 404
 
     # register main routes blueprint
@@ -81,7 +79,7 @@ def create_app(test_config=None):
     cache = Cache(app)
     cache.init_app(app)
     app.cache = cache
-    #Force a redirect to login page when JWT token is expired or doesnt exist. Default returns json
+    #Force a redirect to login page when JWT token is expired or doesnt exist. other wise Default returns json
     @jwt.unauthorized_loader
     def unauthorized_callback(error_string):
         return redirect(url_for('wirecat.login'))

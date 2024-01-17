@@ -5,17 +5,20 @@
 {% endblock %}
 
 {% block content %}
+<div class="section">
 <p>{{user.email}}</p>
 <p>{{user.first_name}}</p>
 <p>{{user.last_name}}</p>
 <p>{{user.profile.about}}</p>
 <p>{{user.profile.gender}}</p>
 <p>{{user.profile.dob}}</p>
+</div>
 
 {% if posts %}
     {% for post in posts %}
-        <div>{{post.title}}</div>
+        <div class="section">{{post.title}}</div>
 
     {% endfor %}
 {% endif %}
+</div>
 {% endblock %}

@@ -1,4 +1,18 @@
-.content {
+.section>img {
+    width: 10em;
+}
+
+.section {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+}
+
+.post-info {
+    margin-left: 1em;
+    flex-wrap: wrap;
+}
+
+.post-info>p {
+    flex-wrap: wrap;
+    max-width: 40em;
 }
