@@ -3,7 +3,7 @@ import random
 import string
 import json
 from datetime import datetime
-
+import secrets
 from bs4 import BeautifulSoup
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -23,14 +23,15 @@ can_post = ['superadmin', 'admin', 'author']
 see_own_stats = ['superadmin', 'admin', 'author']
 see_all_stats = ['superadmin', 'admin']
 can_create_post= ['superadmin', 'admin', 'author']
-can_publish = ['superadmin', 'admin']
-can_delete = ['superadmin']
-can_highlight = ['superadmin']
-
-
-class InvalidPost(Exception):
+can_publish = ['admin', 'superadmin', 'admin']
+can_delete = ['admin', 'superadmin']
+can_highlight = ['admin', 'superadmin']
+can_register_users = ['admin', 'superadmin']
+can_register_admins = ['superadmin']
+autogen_api_key_users = ['superadmin', 'admin', 'author']
+class InvalidRequest(Exception):
     def __str__(self):
-        return "Post Failed Validation."
+        return "Request Failed Validation. Please ensure all necessary parameters are provided"
 
 class InvalidCredentials(Exception):
     def __str__(self):
@@ -146,7 +147,7 @@ def add_post():
             # This function doesn nothing at the moment. In the future it should sanitize the
             # post contents and verify the necessary fileds exist
             if not catlib.verify_post(request):
-                raise InvalidPost
+                raise InvalidRequest
 
             # Save the included files in a directory structure based on the date (YYYY/MM/DD)
             for f in request.files:
@@ -196,7 +197,7 @@ def add_post():
         except IntegrityError as e:
             response = jsonify(type='post', success=False, msg=f'{str(e.orig)}'), 200
         
-        except InvalidPost as e:
+        except InvalidRequest as e:
             response = jsonify(type='post', success=False, msg=f'{e}'), 200
         
         except InvalidCredentials as e:
@@ -456,6 +457,85 @@ def unhighlight(id_type, target):
         response = jsonify(type='feature', success=False, msg=f'{e}'), 200
     except DoesNotExist as e:
         response = jsonify(type='feature', success=False, msg=f'{e}'), 200
+    finally:
+        if not response:
+            response = jsonify(error="Something unexpected happened")
+        return response
+
+@wc_api.route('/api/v1/users/register')
+def register_user():
+    try:
+        response = None
+        key = request.form.get('key', None)
+        api_user = request.form.get('username', None)
+
+        new_user = request.form.get('newuser', None)
+        email = request.form.get('email', None)
+        password = request.form.get('password', None)
+        access_level = request.form.get('access_level', None)
+
+
+        if not new_user or not email or not password:
+            raise InvalidRequest
+
+        hashed_pass = generate_password_hash(password, method='pbkdf2:sha256')
+
+        if not api_user and key:
+            raise InvalidCredentials
+
+        if key and api_user:
+            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        
+        if user and user.perm not in can_register_users:
+            raise InvalidCredentials
+
+        if not user.keys.key:
+            raise InvalidCredentials
+
+        valid = check_password_hash(user.keys.key, key)
+
+        if not valid:
+            raise InvalidCredentials
+        date = datetime.now()
+        newuser = User(username = new_user, email = email, password = hashed_pass, creation_date=f'{date.year}/{date.month}/{date.day}' )
+        if access_level:
+            newuser.perm = access_level
+        # add user 
+
+        db.session.add(newuser)
+        db.session.commit()
+
+        # add user Profile, Meta and Keys if needed
+        user = User.query.filter_by(username = newuser.username).first()
+        user_profile = Profile(user_id = user.id)
+        user_meta = UserMeta(user_id = user.id)
+        print(user.perm)
+        if user.perm in autogen_api_key_users:
+            key = secrets.token_hex(32)
+            hashed_key = generate_password_hash(key, method='pbkdf2:sha256')
+            user_key = ApiKeys(user_id=user.id, key = hashed_key, expires='never')
+            db.session.add(user_key)
+            db.session.commit()
+        db.session.add(user_profile)
+        db.session.add(user_meta)
+        db.session.commit()
+        response = jsonify(type='get', success=True, msg=f"User {newuser} was successfully created"), 200
+
+    except IntegrityError as e:
+        db.session.rollback()
+        response = jsonify(type='register', success=False, msg=f'{str(e.orig)}'), 200
+
+    except InvalidRequest as e:
+        response = jsonify(type='register', success=False, msg=f'{str(e)}'), 200
+
+    except InvalidCredentials as e:
+        db.session.rollback()
+        response = jsonify(type='register', success=False, msg=f'{e}'), 200
+
+    except Exception as e:
+        db.session.rollback()
+        response = jsonify(type='register', success=False, msg=f'{e}'), 200
+
     finally:
         if not response:
             response = jsonify(error="Something unexpected happened")

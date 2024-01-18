@@ -12,9 +12,9 @@ Sections:
         mimi
 """
 import os
-from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint, abort, current_app
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint, abort, current_app, make_response
 from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, jwt_required, get_jwt
+from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, jwt_required, get_jwt, unset_jwt_cookies
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from sqlalchemy.orm import joinedload
 from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile
@@ -83,7 +83,7 @@ def dashboard():
     if not user:
         return redirect(url_for('wirecat.login'))
 
-    db_user = User.query.options(joinedload(User.meta), joinedload(User.profile)).filter_by(username=user).first()
+    db_user = User.query.options(joinedload(User.meta), joinedload(User.profile), joinedload(User.keys)).filter_by(username=user).first()
     return render_template('dashboard.html', user=db_user)
     
 @wc.route('/downloads')
@@ -108,6 +108,12 @@ def blog_post(post_slug):
 @wc.route('/login')
 def login():
     return render_template('login.html')
+
+@wc.route('/logout', methods=['GET','POST'])
+def logout():
+    response = make_response(redirect(url_for('wirecat.home')))  # Redirect to home or login page
+    unset_jwt_cookies(response)  # This will remove the JWT cookies
+    return response
 
 def get_post(url_slug):
     p = Post.query.options(joinedload(Post.author)).filter_by(slug=url_slug).first()

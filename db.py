@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, backref
 from sqlalchemy import Integer, String, Boolean, ForeignKey
+
 class Base(DeclarativeBase):
   pass
 
@@ -57,8 +58,8 @@ class User(db.Model):
 class UserMeta(db.Model):
     id:Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id:Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)
-    favorites:Mapped[str] = mapped_column(String, unique=False, nullable=False)
-    upvotes:Mapped[str] = mapped_column(String, unique=False, nullable=False)
+    favorites:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    upvotes:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     views:Mapped[str] = mapped_column(Integer, unique=False, nullable=True, default=0)
     user = relationship('User', backref=backref('meta', uselist=False))
 
@@ -89,15 +90,3 @@ class ApiKeys(db.Model):
     def __repr__(self):
         return f'{self.user_id}'
 
-
-class Posast(db.Model):
-    id:Mapped[int] = mapped_column(Integer, primary_key=True)
-    post_id:Mapped[str] = mapped_column(String, unique=True, nullable=False) 
-    slug:Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    title:Mapped[str] = mapped_column(String, unique=True, nullable=False)
-    html_content:Mapped[str] = mapped_column(String, unique=False, nullable=True)
-    summary:Mapped[str] = mapped_column(String, unique=False, nullable=True)
-    thumbnail:Mapped[str] = mapped_column(String, unique=False, nullable=True)
-    publish_date:Mapped[str] = mapped_column(String, unique=False, nullable=False)
-    published:Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    featured:Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
