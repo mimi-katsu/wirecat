@@ -88,3 +88,16 @@ class ApiKeys(db.Model):
     user = relationship('User', backref=backref('keys', uselist=False))
     def __repr__(self):
         return f'{self.user_id}'
+
+
+class Posast(db.Model):
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    post_id:Mapped[str] = mapped_column(String, unique=True, nullable=False) 
+    slug:Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    title:Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    html_content:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    summary:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    thumbnail:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    publish_date:Mapped[str] = mapped_column(String, unique=False, nullable=False)
+    published:Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    featured:Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)

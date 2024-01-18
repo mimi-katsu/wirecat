@@ -17,5 +17,8 @@ build/
 
 *.jpg
 
-mimi.key
 *.key
+
+alembic.ini
+
+alembic/

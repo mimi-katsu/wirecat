@@ -5,6 +5,8 @@ import getpass
 import sys
 import requests
 from bs4 import BeautifulSoup, Comment
+import secrets
+
 class Option:
     def __init__(self, func, help:str):
         self.func = func
@@ -16,7 +18,7 @@ class Option:
 def create_parser():
     parser = argparse.ArgumentParser(description="Client for interacting with the wirecat api.")
 
-    parser.add_argument("method", type=str, help="The type of action to take. ['post', 'delete', 'highlight', 'unhighlight','publish','hide','flush','ban','unban', 'hidden']")
+    parser.add_argument("method", type=str, help="The type of action to take. ['post', 'delete', 'highlight', 'unhighlight','publish','hide','flush','ban','unban', 'hidden', 'newuser']")
     parser.add_argument("--host", type=str, help="Host domain or ip address", required=True)
     parser.add_argument("-u", type=str, help="Username to authenticate with", required=True)
     parser.add_argument("-k", type=str, help="Path to api key to authenticate with", required=True)
@@ -24,6 +26,12 @@ def create_parser():
     parser.add_argument("--id", type=str, help="Identify target post or user by id")
     parser.add_argument("--name", type=str, help="Identify target post or user by name (url slug or user name)")
     parser.add_argument("-f", type=str, help="HTML file path to upload as a post.")
+    parser.add_argument("--email", type=str, help="Specify email for user creation or identification")
+    parser.add_argument("--password", type=str, help="Specify password for new user creation")
+    parser.add_argument("--access", type=str, help="HTML file path to upload as a post.")
+
+
+
     return parser
 
 def post(args):
@@ -280,11 +288,11 @@ def get_hidden(args):
             # print(response.text)
             try:
                 r = json.loads(response.text)
+                print(f'''Status: {r['success']}''')
+                print(f'''Type: {r['type']}\n\n''')
             except json.JSONDecodeError:
                 print("Unexpected response from server")
                 exit()
-            print(f'''Status: {r['success']}''')
-            print(f'''Type: {r['type']}\n\n''')
             try:
                 for p in r['msg']:
                     for key, value in p.items():
@@ -298,7 +306,60 @@ def get_hidden(args):
 # 
 # def unban(args):
 # 
-# 
+def register_user(args):
+    if not args.u:
+        print("Please specify a username to authenticate as")
+        return
+
+    if not args.k:
+        print("Please specify your password or api key")
+        return
+
+    data = {'username': args.u}
+
+    if not args.name:
+        user = input('Enter username:\n')
+    
+    data['newuser'] = user
+
+    if not args.email:
+        email = input('Enter user email address:\n')
+
+    data['email'] = email
+
+
+    if not args.password:
+        password = getpass.getpass('Enter user password:\n')
+        if password == '':
+            password = secrets.token_hex(10)
+
+    data['password'] = password
+
+    if not args.access:
+        access = input('Enter user access level (user, author, admin) Default is "user"\n')
+        if access == '':
+            access = None
+
+    if access:
+        data['access_level'] = access
+
+    if args.k:
+        with open(f'{args.k}', 'r') as key:
+            data['key'] = key
+            print(data)
+            print(f'Sending request to register user:\n\n "{user}"\n\n')
+            response = requests.get(f'http://127.0.0.1:5001/api/v1/users/register', data=data)
+            # print(response.text)
+            try:
+                r = json.loads(response.text)
+            except json.JSONDecodeError:
+                print("Unexpected response from server")
+                exit()
+            print(f'''Status: {r['success']}''')
+            print(f'''Message: {r['msg']}''')
+            print(f'''Type: {r['type']}''')
+            print('\n\n')
+ 
 
 def create_options():
     return {
@@ -308,7 +369,8 @@ def create_options():
         'unhighlight': Option(unhighlight, "Remove a post from the featured category"),
         'publish': Option(publish, "Make a post visible to all users on the site"),
         'hide': Option(hide, "Make a post visible only to it's author and admins"),
-        'hidden': Option(get_hidden, "Get a JSON formatted list of all unpublished posts")
+        'hidden': Option(get_hidden, "Get a JSON formatted list of all unpublished posts"),
+        'newuser': Option(register_user, "Create a new user")
         # 'flush': Option(flush, "flush out the site caches"),
         # 'ban': Option(ban,"Ban a users account"),
         # 'unban': Option(unban, "Unban a users account")
