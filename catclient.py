@@ -284,9 +284,14 @@ def get_hidden(args):
                 print("Unexpected response from server")
                 exit()
             print(f'''Status: {r['success']}''')
-            print(f'''Message: {r['msg']}''')
-            print(f'''Type: {r['type']}''')
-            print('\n\n')
+            print(f'''Type: {r['type']}\n\n''')
+            try:
+                for p in r['msg']:
+                    for key, value in p.items():
+                        print(f'{key}: {value}')
+                    print('\n\n')
+            except AttributeError:
+                print('Either there are no posts or something went wrong')
 # def flush(args):
 # 
 # def ban(args):

@@ -54,11 +54,24 @@ class catlib:
                         post['post_id']=obj.post_id
                         post['slug']=obj.slug
                         post['title']=obj.title
+                        post['summary']=obj.summary
                         post['thumbnail']=obj.thumbnail
                         post['publish_date']=obj.publish_date
                         posts.append(post)
                 return posts
 
+        def serialize_posts_for_admin(orm_obj_list):
+                posts = []
+                for obj in orm_obj_list:
+                        post = {}
+                        post['id'] = obj.id
+                        post['post_id']=obj.post_id
+                        post['slug']=obj.slug
+                        post['title']=obj.title
+                        post['publish_date']=obj.publish_date
+                        post['author'] = obj.author.username
+                        posts.append(post)
+                return posts
 
         def deserialize_posts(serialized_obj_list):
                 posts = []

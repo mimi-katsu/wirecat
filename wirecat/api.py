@@ -71,26 +71,26 @@ def get_hidden():
         # match password hashes
         valid = check_password_hash(user.keys.key, key)
         if not valid:
-            raise InvalidCredentials\
+            raise InvalidCredentials
 
-        posts = Post.query.filter_by(published=False).all()
+        posts = Post.query.options(joinedload(Post.author)).filter_by(published=False).all()
 
         if not posts:
             raise DoesNotExist
 
-        post_json = catlib.serialize_posts(posts)
+        post_json = catlib.serialize_posts_for_admin(posts)
 
-        response = jsonify(type='publish', success=True, msg=post_json), 200
+        response = jsonify(type='get', success=True, msg=post_json), 200
 
     except InvalidCredentials as e:
         db.session.rollback()
-        response = jsonify(type='publish', success=False, msg=f'{e}'), 200
+        response = jsonify(type='get', success=False, msg=f'{e}'), 200
     except Exception as e:
         db.session.rollback()
-        response = jsonify(type='publish', success=False, msg=f'{e}'), 200
+        response = jsonify(type='get', success=False, msg=f'{e}'), 200
     except DoesNotExist as e:
         db.session.rollback()
-        response = jsonify(type='publish', success=False, msg=f'{e}'), 200
+        response = jsonify(type='get', success=False, msg=f'{e}'), 200
     finally:
         if not response:
             response = jsonify(error="Something unexpected happened")
