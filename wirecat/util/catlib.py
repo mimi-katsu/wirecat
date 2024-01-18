@@ -54,7 +54,6 @@ class catlib:
                         post['post_id']=obj.post_id
                         post['slug']=obj.slug
                         post['title']=obj.title
-                        post['summary']=obj.summary
                         post['thumbnail']=obj.thumbnail
                         post['publish_date']=obj.publish_date
                         posts.append(post)

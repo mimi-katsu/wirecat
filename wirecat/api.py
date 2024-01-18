@@ -51,12 +51,51 @@ def v1_help():
     #   return some json providing a top level overview of the api and how to use it
         return render_template('api-help.html')
 
-# @wc_api.route('/api/v1/posts/get')
-# def get_posts():
-#     posts = Post.query.all()
-#     #TODO:
-#     #   return json explaining how to auth and which child routes are available
-#     return redirect(url_for('wirecat.home')), 200
+@wc_api.route('/api/v1/posts/get/hidden', methods=['GET'])
+def get_hidden():
+    try:
+        response = None
+        key = request.form.get('key', None)
+        api_user = request.form.get('username', None)
+        if not api_user and key:
+            raise InvalidCredentials
+
+        if key and api_user:
+            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        
+        if user and user.perm not in can_highlight:
+            raise InvalidCredentials
+
+        if not user.keys.key:
+            raise InvalidCredentials
+        # match password hashes
+        valid = check_password_hash(user.keys.key, key)
+        if not valid:
+            raise InvalidCredentials\
+
+        posts = Post.query.filter_by(published=False).all()
+
+        if not posts:
+            raise DoesNotExist
+
+        post_json = catlib.serialize_posts(posts)
+
+        response = jsonify(type='publish', success=True, msg=post_json), 200
+
+    except InvalidCredentials as e:
+        db.session.rollback()
+        response = jsonify(type='publish', success=False, msg=f'{e}'), 200
+    except Exception as e:
+        db.session.rollback()
+        response = jsonify(type='publish', success=False, msg=f'{e}'), 200
+    except DoesNotExist as e:
+        db.session.rollback()
+        response = jsonify(type='publish', success=False, msg=f'{e}'), 200
+    finally:
+        if not response:
+            response = jsonify(error="Something unexpected happened")
+        return response
+
 
 @wc_api.route('/api/v1/posts/add', methods=['GET','POST'])
 def add_post():
@@ -318,16 +357,6 @@ def hide(id_type, target):
             response = jsonify(error="Something unexpected happened")
         return response
 # @wc_api.route('/api/v1/posts/edit')
-
-@wc_api.route('/api/v1/posts/update')
-def update_posts():
-    """Update posts held in memory. This will initiate the pulling of content from the 
-    data base and refreshing of the content lists that are held in memory"""
-    if request.headers.get('auth') != s.get_author_key():
-        return 'Forbidden', 403
-    else:
-        # wirecat.posts.update(wirecat.db.get_recent_posts())
-        return 'posts updated', 200
 
 @wc_api.route('/api/v1/posts/highlight/add/<id_type>/<target>')
 def highlight(id_type, target):
