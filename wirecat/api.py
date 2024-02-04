@@ -13,7 +13,7 @@ from flask import Flask, render_template, request, jsonify, redirect, url_for, B
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile
+from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile, Announcement
 from wirecat.util.catlib import catlib
 from wirecat.app import db
 
@@ -29,6 +29,7 @@ can_highlight = ['admin', 'superadmin']
 can_register_users = ['admin', 'superadmin']
 can_register_admins = ['superadmin']
 autogen_api_key_users = ['superadmin', 'admin', 'author']
+make_announcement_users = ['superadmin', 'admin']
 class InvalidRequest(Exception):
     def __str__(self):
         return "Request Failed Validation. Please ensure all necessary parameters are provided"
@@ -540,3 +541,116 @@ def register_user():
         if not response:
             response = jsonify(error="Something unexpected happened")
         return response
+
+@wc_api.route('/api/v1/announcements/add', methods=['POST'])
+def make_announcement():
+    try:
+        response = None
+        key = request.form.get('key', None)
+        api_user = request.form.get('username', None)
+        ann = request.form.get('announcement', None)
+
+        if not ann:
+            raise InvalidRequest
+
+        if not api_user and key:
+            raise InvalidCredentials
+
+        if key and api_user:
+            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        
+        if user and user.perm not in make_announcement_users:
+            raise InvalidCredentials
+
+        if not user.keys.key:
+            raise InvalidCredentials
+
+        valid = check_password_hash(user.keys.key, key)
+
+        if not valid:
+            raise InvalidCredentials
+
+        date = datetime.now()
+        print(date)
+        announcement = Announcement(author = user.username, content = ann, post_date=f'{date}' )
+
+
+        db.session.add(announcement)
+        db.session.commit()
+        current_app.cache.set('announcement', ann)
+        response = jsonify(type='Announce', success=True, msg=f"Announcement was successfully created"), 200
+
+    except IntegrityError as e:
+        db.session.rollback()
+        response = jsonify(type='Announce', success=False, msg=f'{str(e.orig)}'), 200
+
+    except InvalidRequest as e:
+        response = jsonify(type='Announce', success=False, msg=f'{str(e)}'), 200
+
+    except InvalidCredentials as e:
+        db.session.rollback()
+        response = jsonify(type='Announce', success=False, msg=f'{e}'), 200
+
+    except Exception as e:
+        db.session.rollback()
+        response = jsonify(type='Announce', success=False, msg=f'{e}'), 200
+
+    finally:
+        if not response:
+            response = jsonify(error="Something unexpected happened")
+        return response
+
+# @wc_api.route('/api/v1/users/update/<id_type>/<target>/<param>/<value>')
+# def update_user():
+
+#     id_types = ['id', ]
+#     try:
+#         response = None
+#         key = request.form.get('key', None)
+#         api_user = request.form.get('username', None)
+
+#         if not api_user and key:
+#             raise InvalidCredentials
+
+#         if key and api_user:
+#             user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        
+#         if user and user.perm not in can_highlight:
+#             raise InvalidCredentials
+
+#         if not user.keys.key:
+#             raise InvalidCredentials
+#         # match password hashes
+#         valid = check_password_hash(user.keys.key, key)
+#         if not valid:
+#             raise InvalidCredentials
+
+#         if id_type == 'id':
+#             user = User.query.filter_by(id=target).first()
+#         if id_type == 'username':
+#             user = User.query.filter_by(username=target).first()
+
+#         if not post:
+#             raise DoesNotExist
+
+#         post.featured = False
+#         db.session.commit()
+
+#         # Update featured post cache
+#         cache = current_app.cache
+#         featured = Post.query.filter_by(featured=True).limit(5)
+#         to_cache = catlib.serialize_posts(featured)
+#         cache.set('featured', to_cache)
+
+#         response = jsonify(type='unfeature', success=True, msg='Post was successfully removed from featured list'), 200
+
+#     except InvalidCredentials as e:
+#         response = jsonify(type='feature', success=False, msg=f'{e}'), 200
+#     except Exception as e:
+#         response = jsonify(type='feature', success=False, msg=f'{e}'), 200
+#     except DoesNotExist as e:
+#         response = jsonify(type='feature', success=False, msg=f'{e}'), 200
+#     finally:
+#         if not response:
+#             response = jsonify(error="Something unexpected happened")
+#         return response

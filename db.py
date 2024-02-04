@@ -90,3 +90,10 @@ class ApiKeys(db.Model):
     def __repr__(self):
         return f'{self.user_id}'
 
+class Announcement(db.Model):
+    id:Mapped[int] = mapped_column(Integer, primary_key=True)
+    post_date:Mapped[str] = mapped_column(String, unique=False, nullable=False)
+    content:Mapped[str] = mapped_column(String, unique=False, nullable=False)
+    author:Mapped[str] = mapped_column(String, unique=False, nullable=False)
+    def __repr__(self):
+        return f'{self.content} - {self.author}'

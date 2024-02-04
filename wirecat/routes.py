@@ -17,7 +17,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, jwt_required, get_jwt, unset_jwt_cookies
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from sqlalchemy.orm import joinedload
-from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile
+from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile, Announcement
 from wirecat.util.w_secrets import Secrets
 from wirecat.app import db
 from wirecat.util.catlib import catlib
@@ -46,9 +46,17 @@ def home():
     if best:
         best = catlib.deserialize_posts(best)
 
+    ann = cache.get('anonouncement')
+    if not ann:
+        ann = Announcement.query.order_by(Announcement.post_date.desc()) \
+        .limit(1).first()
+        print(ann.content)
+        cache.set('announcement', ann.content)
+
     if not featured:
         current_app.logger.info('DBQUERY: Featured Posts: CACHE')
-        featured = Post.query.filter_by(featured=True, published=True).all()
+        featured = Post.query.filter_by(featured=True, published=True) \
+        .all()
         to_cache = catlib.serialize_posts(featured)
         cache.set('featured', to_cache)
 
@@ -57,18 +65,23 @@ def home():
         .filter_by(published=True) \
         .limit(5) \
         .all()
+        
         to_cache = catlib.serialize_posts(latest)
         cache.set('latest', to_cache)
 
     if not best:
-        best = Post.query.join(PostMeta).order_by(PostMeta.views.desc()).limit(5).all()
+        best = Post.query.join(PostMeta) \
+        .order_by(PostMeta.views.desc()) \
+        .limit(5) \
+        .all()
+        
         to_cache = catlib.serialize_posts(best)
         cache.set('best', to_cache)
 
     for b in featured:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
-    return render_template('frontpage.html', featured=featured, latest_posts = latest, best_posts = best)
+    return render_template('frontpage.html', featured=featured, latest_posts = latest, best_posts = best, announcement=ann.content)
 
 @wc.route('/profiles/<user_slug>')
 def profile(user_slug):

@@ -18,7 +18,7 @@ class Option:
 def create_parser():
     parser = argparse.ArgumentParser(description="Client for interacting with the wirecat api.")
 
-    parser.add_argument("method", type=str, help="The type of action to take. ['post', 'delete', 'highlight', 'unhighlight','publish','hide','flush','ban','unban', 'hidden', 'newuser']")
+    parser.add_argument("method", type=str, help="The type of action to take. ['announce','post', 'delete', 'highlight', 'unhighlight','publish','hide','flush','ban','unban', 'hidden', 'newuser']")
     parser.add_argument("--host", type=str, help="Host domain or ip address", required=True)
     parser.add_argument("-u", type=str, help="Username to authenticate with", required=True)
     parser.add_argument("-k", type=str, help="Path to api key to authenticate with", required=True)
@@ -28,12 +28,38 @@ def create_parser():
     parser.add_argument("-f", type=str, help="HTML file path to upload as a post.")
     parser.add_argument("--email", type=str, help="Specify email for user creation or identification")
     parser.add_argument("--password", type=str, help="Specify password for new user creation")
-    parser.add_argument("--access", type=str, help="HTML file path to upload as a post.")
-
+    parser.add_argument("--access", type=str, help="Specify access level of user to create or modify. ['admin',author,'user']")
+    parser.add_argument("--message", type=str, help="The message to display on the front page of the site.")
 
 
     return parser
 
+def announce(args):
+    if not args.u:
+        print("Please specify a username to authenticate as")
+        return
+    username = args.u
+    if not args.k:
+        print("Please specify your password or api key")
+        return
+
+    if not args.message:
+        print("Please specify the message to display on the front page of the site.")
+        return
+    
+    with open(f'./{args.k}', 'r') as f:
+        key = f.read()
+
+        data = {
+            # "request_type": "json",
+            "username": username,
+            "key": key,
+            "announcement": args.message
+        }
+        print(f'Authenticating as {username}')
+
+        response = requests.post("http://127.0.0.1:5001/api/v1/announcements/add", data=data)
+        print(response.text)
 def post(args):
     if not args.u:
         print("Please specify a username to authenticate as")
@@ -370,7 +396,8 @@ def create_options():
         'publish': Option(publish, "Make a post visible to all users on the site"),
         'hide': Option(hide, "Make a post visible only to it's author and admins"),
         'hidden': Option(get_hidden, "Get a JSON formatted list of all unpublished posts"),
-        'newuser': Option(register_user, "Create a new user")
+        'newuser': Option(register_user, "Create a new user"),
+        'announce': Option(announce, "Make new announcement")
         # 'flush': Option(flush, "flush out the site caches"),
         # 'ban': Option(ban,"Ban a users account"),
         # 'unban': Option(unban, "Unban a users account")

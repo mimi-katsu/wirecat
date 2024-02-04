@@ -31,7 +31,9 @@
 
     <div class="nav">{% block nav %}{% endblock %}</div>
     <div class="announcement-bar">
-        <p>This is an announcement</p>
+        {% if announcement %}
+        <p>{{announcement | safe}}</p>
+        {% endif %} 
     </div>
 
     <div class="content">
