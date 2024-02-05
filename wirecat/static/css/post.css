@@ -24,7 +24,9 @@
     border-radius: 8px;
     max-height: 25em;
 }
-
+.image-container .image-text {
+    align-self: center;
+}
 .post-buttons {
     justify-content: center;
     align-self: center;
@@ -75,14 +77,19 @@
 .section p, .post-head p{
     flex-wrap: wrap;
     align-self: center;
-    margin: 1em;
+}
+.section p {
+    margin-top: 1em;
+    max-width: 55em;
 }
 
-.section h2 {
+
+.section>h2 {
     width: 100%;
     border-bottom: 2px solid var(--border-color-tertiary);
     padding: 1em;
     margin-bottom: 1em;
+    justify-self: center;
 }
 
 li {
@@ -100,7 +107,7 @@ li {
     margin: 1em;
 }
 
-.subtext {
+.section .subtext {
     align-self: center;
     width: 65%;
     font-size: .9em;

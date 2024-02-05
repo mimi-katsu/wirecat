@@ -346,12 +346,12 @@ def register_user(args):
     if not args.name:
         user = input('Enter username:\n')
     
-    data['newuser'] = user
+    data['newuser'] = args.name
 
     if not args.email:
         email = input('Enter user email address:\n')
 
-    data['email'] = email
+    data['email'] = args.email
 
 
     if not args.password:
@@ -359,21 +359,22 @@ def register_user(args):
         if password == '':
             password = secrets.token_hex(10)
 
-    data['password'] = password
+    data['password'] = args.password
 
     if not args.access:
         access = input('Enter user access level (user, author, admin) Default is "user"\n')
         if access == '':
             access = None
 
-    if access:
-        data['access_level'] = access
+    if args.access:
+        access = args.access
+    data['access_level'] = access
 
     if args.k:
         with open(f'{args.k}', 'r') as key:
             data['key'] = key
             print(data)
-            print(f'Sending request to register user:\n\n "{user}"\n\n')
+            print(f'Sending request to register user:\n\n "{args.name}"\n\n')
             response = requests.get(f'http://127.0.0.1:5001/api/v1/users/register', data=data)
             # print(response.text)
             try:

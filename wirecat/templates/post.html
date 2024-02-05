@@ -17,13 +17,12 @@
             <p>published: {{post.published}}</p>
             <p>author: {{post.author}}</p>
             <p>author_id: {{post.author.id}}</p>
-            
             <p>Upvotes: {{post.meta.upvotes}}</p>
             <p>Favorites: {{post.meta.favorites}}</p>
             <p>Views: {{post.meta.views}} </p>
 
             </div>
-    </div>
+        </div>
     {% endif %}
 {% endif %}
     <div class="post-head">
@@ -43,7 +42,10 @@
 
     </div>
 
-         {{post.html_content | safe}}
-
-
+    {{post.html_content | safe}}
+    <div class="subsection">final subsection</div>
+    <div class="section signature">
+        <p>{{post.author.profile.signature}}</p>
+        <a href="/profiles/{{post.author.username}}" class="link">View {{post.author.username}}'s profile</a>
+    </div>
 {% endblock %}

@@ -50,8 +50,8 @@ def home():
     if not ann:
         ann = Announcement.query.order_by(Announcement.post_date.desc()) \
         .limit(1).first()
-        print(ann.content)
-        cache.set('announcement', ann.content)
+        if ann:
+            cache.set('announcement', ann.content)
 
     if not featured:
         current_app.logger.info('DBQUERY: Featured Posts: CACHE')
@@ -81,7 +81,7 @@ def home():
     for b in featured:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
-    return render_template('frontpage.html', featured=featured, latest_posts = latest, best_posts = best, announcement=ann.content)
+    return render_template('frontpage.html', featured=featured, latest_posts = latest, best_posts = best, announcement=ann)
 
 @wc.route('/profiles/<user_slug>')
 def profile(user_slug):

@@ -71,6 +71,7 @@ class Profile(db.Model):
     user_id:Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)
     gender:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     photo_path:Mapped[str] = mapped_column(String, unique=True, nullable=True)
+    signature:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     first_name:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     last_name:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     dob:Mapped[str] = mapped_column(String, unique=False, nullable=True)
