@@ -33,7 +33,7 @@
     <div class="nav">{% block nav %}{% endblock %}</div>
     <div class="announcement-bar">
         {% if announcement %}
-            <p>{{announcement.content | safe}}</p>
+            <p>{{announcement | safe}}</p>
         {% endif %} 
     </div>
 

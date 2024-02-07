@@ -5,7 +5,7 @@ import random
 import string
 import secrets
 import re
-from db import Post
+from wirecat.db import Post
 class catlib:
         def generate_api_key():
                 return secrets.token_hex(32)

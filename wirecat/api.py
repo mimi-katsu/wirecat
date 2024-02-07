@@ -5,15 +5,18 @@ import json
 from datetime import datetime
 import secrets
 from bs4 import BeautifulSoup
+
 from werkzeug.utils import secure_filename
 from werkzeug.security import check_password_hash, generate_password_hash
+
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask import Flask, render_template, request, jsonify, redirect, url_for, Blueprint, current_app
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload
 
-from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile, Announcement
+from wirecat.db import User, Post, PostMeta, UserMeta, ApiKeys, Profile, Announcement
 from wirecat.util.catlib import catlib
 from wirecat.app import db
 
@@ -30,6 +33,30 @@ can_register_users = ['admin', 'superadmin']
 can_register_admins = ['superadmin']
 autogen_api_key_users = ['superadmin', 'admin', 'author']
 make_announcement_users = ['superadmin', 'admin']
+
+
+id_types = {'username', 'id', 'url_slug'}
+user_attr = {'first_name', 'last_name', 'gender', 'photo_path', 'signature', 'experience', 'about'}
+
+def get_verify_api_user(request):
+    key = request.form.get('key', None)
+    api_user = request.form.get('username', None)
+    if not api_user and key:
+        raise InvalidCredentials
+
+    user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+    if not user:
+        raise InvalidCredentials
+    # check for api key
+    if not user.keys.key:
+        raise InvalidCredentials
+    # match password hashes
+    valid = check_password_hash(user.keys.key, key)
+    if not valid:
+        raise InvalidCredentials    
+
+    return user
+
 class InvalidRequest(Exception):
     def __str__(self):
         return "Request Failed Validation. Please ensure all necessary parameters are provided"
@@ -57,22 +84,10 @@ def v1_help():
 def get_hidden():
     try:
         response = None
-        key = request.form.get('key', None)
-        api_user = request.form.get('username', None)
-        if not api_user and key:
-            raise InvalidCredentials
-
-        if key and api_user:
-            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        # verify credentials in request and return the associated user if valid. 
+        user = get_verify_api_user(request)
         
-        if user and user.perm not in can_highlight:
-            raise InvalidCredentials
-
-        if not user.keys.key:
-            raise InvalidCredentials
-        # match password hashes
-        valid = check_password_hash(user.keys.key, key)
-        if not valid:
+        if user.perm not in current_app.config['CAN_PUBLISH']:
             raise InvalidCredentials
 
         posts = Post.query.options(joinedload(Post.author)).filter_by(published=False).all()
@@ -82,26 +97,25 @@ def get_hidden():
 
         post_json = catlib.serialize_posts_for_admin(posts)
 
-        response = jsonify(type='get', success=True, msg=post_json), 200
+        response = jsonify(type='get', success=True, msg=post_json, usr=user.username), 200
 
     except InvalidCredentials as e:
         db.session.rollback()
-        response = jsonify(type='get', success=False, msg=f'{e}'), 200
+        response = jsonify(type='get', success=False, msg=f'{e}'), 403
     except Exception as e:
         db.session.rollback()
-        response = jsonify(type='get', success=False, msg=f'{e}'), 200
+        response = jsonify(type='get', success=False, msg=f'{e}'), 500
     except DoesNotExist as e:
         db.session.rollback()
-        response = jsonify(type='get', success=False, msg=f'{e}'), 200
+        response = jsonify(type='get', success=False, msg=f'{e}'), 404
     finally:
         if not response:
-            response = jsonify(error="Something unexpected happened")
+            response = jsonify(error="Something unexpected happened"), 500
         return response
 
 
 @wc_api.route('/api/v1/posts/add', methods=['GET','POST'])
 def add_post():
-    print('adding post')
     if request.method == 'GET':
         return jsonify(error="Invalid method"), 200
 
@@ -109,27 +123,9 @@ def add_post():
         try:
             response = None
 
-            key = request.form.get('key', None)
-            api_user = request.form.get('username', None)
+            user = get_verify_api_user(request)
 
-            #check if form contains required data
-            if not api_user and key:
-                raise InvalidCredentials
-
-            #make database query
-            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
-
-            #check for existence of api key
-            if not user and user.keys.key:
-                raise InvalidCredentials
-
-            # check user access level
-            if user.perm not in can_post:
-                raise InvalidCredentials
-
-            # match key hashes
-            valid = check_password_hash(user.keys.key, key)
-            if not valid:
+            if user.perm not in current_app.config["CAN_POST"]:
                 raise InvalidCredentials
 
             # initialize some useful values
@@ -216,22 +212,9 @@ def delete_post(id_type, target):
         return jsonify(type='delete', success=False, msg='Invalid Method'), 200
     try:
         response = None
-        key = request.form.get('key', None)
-        api_user = request.form.get('username', None)
-        if not api_user and key:
-            raise InvalidCredentials
+        user = get_verify_api_user(request)
 
-        if key and api_user:
-            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
-        
-        if user and user.perm not in can_delete:
-            raise InvalidCredentials
-
-        if not user.keys.key:
-            raise InvalidCredentials
-        # match password hashes
-        valid = check_password_hash(user.keys.key, key)
-        if not valid:
+        if user.perm not in current_app.config["CAN_DELETE"]:
             raise InvalidCredentials
 
         if id_type == 'slug':
@@ -242,8 +225,13 @@ def delete_post(id_type, target):
         if not post:
             raise DoesNotExist
 
+        current_app.cache.set('best', "")
+        current_app.cache.set('featured', "")
+        current_app.cache.set('latest', "")
+
         meta = PostMeta.query.filter_by(post_id=post.id).first()
-        db.session.delete(meta)
+        if meta:
+            db.session.delete(meta)
         db.session.delete(post)
         db.session.commit()
 
@@ -256,7 +244,7 @@ def delete_post(id_type, target):
         response = jsonify(type='delete', success=False, msg=f'{e}'), 200
         
     except Exception as e:
-        response = jsonify(type='feature', success=False, msg=f'{e}'), 200
+        response = jsonify(type='delete', success=False, msg=f'{e}'), 200
     finally:
         if not response:
             response = jsonify(error="Something unexpected happened")
@@ -266,23 +254,11 @@ def delete_post(id_type, target):
 def publish(id_type, target):
     try:
         response = None
-        key = request.form.get('key', None)
-        api_user = request.form.get('username', None)
-        if not api_user and key:
-            raise InvalidCredentials
-
-        if key and api_user:
-            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        user = get_verify_api_user(request)
         
-        if user and user.perm not in can_highlight:
+        if user.perm not in current_app.config["CAN_PUBLISH"]:
             raise InvalidCredentials
 
-        if not user.keys.key:
-            raise InvalidCredentials
-        # match password hashes
-        valid = check_password_hash(user.keys.key, key)
-        if not valid:
-            raise InvalidCredentials
         if id_type == 'slug':
             post = Post.query.filter_by(slug=target).first()
         if id_type == 'id':
@@ -314,22 +290,9 @@ def publish(id_type, target):
 def hide(id_type, target):
     try:
         response = None
-        key = request.form.get('key', None)
-        api_user = request.form.get('username', None)
-        if not api_user and key:
-            raise InvalidCredentials
-
-        if key and api_user:
-            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        user = get_verify_api_user(request)
         
-        if user and user.perm not in can_highlight:
-            raise InvalidCredentials
-
-        if not user.keys.key:
-            raise InvalidCredentials
-        # match password hashes
-        valid = check_password_hash(user.keys.key, key)
-        if not valid:
+        if user.perm not in current_app.config["CAN_PUBLISH"]:
             raise InvalidCredentials
 
         if id_type == 'slug':
@@ -358,29 +321,16 @@ def hide(id_type, target):
         if not response:
             response = jsonify(error="Something unexpected happened")
         return response
-# @wc_api.route('/api/v1/posts/edit')
 
 @wc_api.route('/api/v1/posts/highlight/add/<id_type>/<target>')
 def highlight(id_type, target):
     try:
         response = None
-        key = request.form.get('key', None)
-        api_user = request.form.get('username', None)
-        if not api_user and key:
-            raise InvalidCredentials
-
-        if key and api_user:
-            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        user = get_verify_api_user(request)
         
-        if user and user.perm not in can_highlight:
+        if user.perm not in can_highlight:
             raise InvalidCredentials
 
-        if not user.keys.key:
-            raise InvalidCredentials
-        # match password hashes
-        valid = check_password_hash(user.keys.key, key)
-        if not valid:
-            raise InvalidCredentials
         if id_type == 'slug':
             post = Post.query.filter_by(slug=target).first()
         if id_type == 'id':
@@ -415,15 +365,9 @@ def highlight(id_type, target):
 def unhighlight(id_type, target):
     try:
         response = None
-        key = request.form.get('key', None)
-        api_user = request.form.get('username', None)
-        if not api_user and key:
-            raise InvalidCredentials
-
-        if key and api_user:
-            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
+        user = get_verify_api_user(request)
         
-        if user and user.perm not in can_highlight:
+        if user.perm not in current_app.config["CAN_HIGHLIGHT"]:
             raise InvalidCredentials
 
         if not user.keys.key:
@@ -467,8 +411,7 @@ def unhighlight(id_type, target):
 def register_user():
     try:
         response = None
-        key = request.form.get('key', None)
-        api_user = request.form.get('username', None)
+        user = get_verify_api_user(request)
 
         new_user = request.form.get('newuser', None)
         email = request.form.get('email', None)
@@ -480,25 +423,13 @@ def register_user():
             raise InvalidRequest
 
         hashed_pass = generate_password_hash(password, method='pbkdf2:sha256')
-
-        if not api_user and key:
-            raise InvalidCredentials
-
-        if key and api_user:
-            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
         
-        if user and user.perm not in can_register_users:
+        if user.perm not in current_app.config["CAN_REGISTER_USERS"]:
             raise InvalidCredentials
 
-        if not user.keys.key:
-            raise InvalidCredentials
-
-        valid = check_password_hash(user.keys.key, key)
-
-        if not valid:
-            raise InvalidCredentials
         date = datetime.now()
         newuser = User(username = new_user, email = email, password = hashed_pass, creation_date=f'{date.year}/{date.month}/{date.day}' )
+        
         if access_level:
             newuser.perm = access_level
         # add user 
@@ -507,18 +438,17 @@ def register_user():
         db.session.commit()
 
         # add user Profile, Meta and Keys if needed
-        user = User.query.filter_by(username = newuser.username).first()
-        user_profile = Profile(user_id = user.id)
-        user_meta = UserMeta(user_id = user.id)
-        print(user.perm)
-        if user.perm in autogen_api_key_users:
+        newuser = User.query.filter_by(username = newuser.username).first()
+        newuser_profile = Profile(user_id = newuser.id)
+        newuser_meta = UserMeta(user_id = newuser.id)
+        if newuser.perm in autogen_api_key_users:
             key = secrets.token_hex(32)
             hashed_key = generate_password_hash(key, method='pbkdf2:sha256')
             user_key = ApiKeys(user_id=user.id, key = hashed_key, expires='never')
             db.session.add(user_key)
             db.session.commit()
-        db.session.add(user_profile)
-        db.session.add(user_meta)
+        db.session.add(newuser_profile)
+        db.session.add(newuser_meta)
         db.session.commit()
         response = jsonify(type='get', success=True, msg=f"User {newuser} was successfully created"), 200
 
@@ -546,38 +476,25 @@ def register_user():
 def make_announcement():
     try:
         response = None
-        key = request.form.get('key', None)
-        api_user = request.form.get('username', None)
+        user = get_verify_api_user(request)
         ann = request.form.get('announcement', None)
 
         if not ann:
             raise InvalidRequest
-
-        if not api_user and key:
-            raise InvalidCredentials
-
-        if key and api_user:
-            user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
         
-        if user and user.perm not in make_announcement_users:
-            raise InvalidCredentials
-
-        if not user.keys.key:
-            raise InvalidCredentials
-
-        valid = check_password_hash(user.keys.key, key)
-
-        if not valid:
+        if user.perm not in current_app.config["CAN_MAKE_ANNOUNCEMENTS"]:
             raise InvalidCredentials
 
         date = datetime.now()
-        print(date)
+
         announcement = Announcement(author = user.username, content = ann, post_date=f'{date}' )
 
 
         db.session.add(announcement)
         db.session.commit()
+
         current_app.cache.set('announcement', ann)
+        print(ann)
         response = jsonify(type='Announce', success=True, msg=f"Announcement was successfully created"), 200
 
     except IntegrityError as e:
@@ -600,12 +517,19 @@ def make_announcement():
             response = jsonify(error="Something unexpected happened")
         return response
 
-# @wc_api.route('/api/v1/users/update/<id_type>/<target>/<param>/<value>')
-# def update_user():
+# @wc_api.route('/api/v1/users/update/<id_type>/<target>/<param>')
+# def update_user(id_type,target,param,value):
 
-#     id_types = ['id', ]
+    
 #     try:
 #         response = None
+
+#         if id_type not in id_types:
+#             raise InvalidRequest
+
+#         if param not in user_attr:
+#             raise InvalidRequest
+
 #         key = request.form.get('key', None)
 #         api_user = request.form.get('username', None)
 
@@ -614,9 +538,6 @@ def make_announcement():
 
 #         if key and api_user:
 #             user = User.query.options(joinedload(User.keys)).filter_by(username=api_user).first()
-        
-#         if user and user.perm not in can_highlight:
-#             raise InvalidCredentials
 
 #         if not user.keys.key:
 #             raise InvalidCredentials
@@ -626,24 +547,20 @@ def make_announcement():
 #             raise InvalidCredentials
 
 #         if id_type == 'id':
-#             user = User.query.filter_by(id=target).first()
+#             profile = Profile.query.filter_by(user_id=target).first()
 #         if id_type == 'username':
-#             user = User.query.filter_by(username=target).first()
+#             user = Profile.query.filter_by(user_id=target).first()
 
-#         if not post:
+#         if not user:
 #             raise DoesNotExist
 
-#         post.featured = False
+        
+
 #         db.session.commit()
 
-#         # Update featured post cache
-#         cache = current_app.cache
-#         featured = Post.query.filter_by(featured=True).limit(5)
-#         to_cache = catlib.serialize_posts(featured)
-#         cache.set('featured', to_cache)
-
-#         response = jsonify(type='unfeature', success=True, msg='Post was successfully removed from featured list'), 200
-
+#         response = jsonify(type='Update User', success=True, msg='User was successfully updated'), 200
+#     except InvalidRequest as e:
+#         response = jsonify("Type":"Update User", "Status": "Failed", "Msg":f"{e}")
 #     except InvalidCredentials as e:
 #         response = jsonify(type='feature', success=False, msg=f'{e}'), 200
 #     except Exception as e:

@@ -45,7 +45,9 @@
     {{post.html_content | safe}}
     <div class="subsection">final subsection</div>
     <div class="section signature">
-        <p>{{post.author.profile.signature}}</p>
+        {% if post.author.profile.signature %}
+            <p>{{post.author.profile.signature}}</p>
+        {% endif %}
         <a href="/profiles/{{post.author.username}}" class="link">View {{post.author.username}}'s profile</a>
     </div>
 {% endblock %}

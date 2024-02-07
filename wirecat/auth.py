@@ -6,7 +6,7 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 import datetime
-from db import User
+from wirecat.db import User
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, joinedload
 from sqlalchemy import Integer, String
@@ -49,8 +49,6 @@ def login_api():
             # if credentials are invalid, redirect back to login and display invalid login message
             flash('Invalid login')
             return redirect('/login')
-
-@wc_auth.route('/logout')
 
 @wc_auth.route('/verify', methods = ['GET', 'POST'])
 @jwt_required()

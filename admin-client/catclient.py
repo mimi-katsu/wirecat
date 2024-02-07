@@ -60,6 +60,7 @@ def announce(args):
 
         response = requests.post("http://127.0.0.1:5001/api/v1/announcements/add", data=data)
         print(response.text)
+
 def post(args):
     if not args.u:
         print("Please specify a username to authenticate as")
@@ -314,6 +315,8 @@ def get_hidden(args):
             # print(response.text)
             try:
                 r = json.loads(response.text)
+                for k, v in r.items():
+                    print(f"{k}: {v}")
                 print(f'''Status: {r['success']}''')
                 print(f'''Type: {r['type']}\n\n''')
             except json.JSONDecodeError:

@@ -17,7 +17,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import get_jwt_identity, verify_jwt_in_request, jwt_required, get_jwt, unset_jwt_cookies
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from sqlalchemy.orm import joinedload
-from db import User, Post, PostMeta, UserMeta, ApiKeys, Profile, Announcement
+from sqlalchemy import and_
+from wirecat.db import User, Post, PostMeta, UserMeta, ApiKeys, Profile, Announcement
 from wirecat.util.w_secrets import Secrets
 from wirecat.app import db
 from wirecat.util.catlib import catlib
@@ -45,16 +46,8 @@ def home():
     best = cache.get('best')
     if best:
         best = catlib.deserialize_posts(best)
-
-    ann = cache.get('anonouncement')
-    if not ann:
-        ann = Announcement.query.order_by(Announcement.post_date.desc()) \
-        .limit(1).first()
-        if ann:
-            cache.set('announcement', ann.content)
-
+        
     if not featured:
-        current_app.logger.info('DBQUERY: Featured Posts: CACHE')
         featured = Post.query.filter_by(featured=True, published=True) \
         .all()
         to_cache = catlib.serialize_posts(featured)
@@ -70,7 +63,8 @@ def home():
         cache.set('latest', to_cache)
 
     if not best:
-        best = Post.query.join(PostMeta) \
+        best = Post.query.filter_by(published=True) \
+        .join(PostMeta) \
         .order_by(PostMeta.views.desc()) \
         .limit(5) \
         .all()
@@ -81,7 +75,7 @@ def home():
     for b in featured:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
-    return render_template('frontpage.html', featured=featured, latest_posts = latest, best_posts = best, announcement=ann)
+    return render_template('frontpage.html', featured=featured, latest_posts = latest, best_posts = best)
 
 @wc.route('/profiles/<user_slug>')
 def profile(user_slug):
@@ -96,7 +90,7 @@ def dashboard():
     if not user:
         return redirect(url_for('wirecat.login'))
 
-    db_user = User.query.options(joinedload(User.meta), joinedload(User.profile), joinedload(User.keys)).filter_by(username=user).first()
+    db_user = User.query.options(joinedload(User.meta), joinedload(User.profile)).filter_by(username=user).first()
     return render_template('dashboard.html', user=db_user)
     
 @wc.route('/downloads')
@@ -106,10 +100,6 @@ def downloads():
 @wc.route('/forum')
 def community():
     return render_template('forum.html')
-
-@wc.route('/p')
-def blog():
-    return 'Blog'
 
 @wc.route('/post/<post_slug>')
 def blog_post(post_slug):
@@ -129,7 +119,7 @@ def logout():
     return response
 
 def get_post(url_slug):
-    p = Post.query.options(joinedload(Post.author)).filter_by(slug=url_slug).first()
+    p = Post.query.options(joinedload(Post.author)).filter_by(slug=url_slug, published=True).first()
     if p:
         if not p.meta:
             meta = PostMeta(post_id=p.id)
@@ -150,3 +140,16 @@ def check_login():
         auth_level = token_values.get('auth_level')
         login_status=  {'logged_in':True, 'auth_level': auth_level}
     return login_status
+
+@wc.context_processor
+def main_nav():
+    ann = current_app.cache.get('announcement')
+    if not ann:
+        announce = Announcement.query.order_by(Announcement.post_date.desc()) \
+        .limit(1) \
+        .first()
+        ann = announce.content
+        current_app.cache.set('announcement', ann)
+    
+    announcement = {"announcement": ann}
+    return announcement
