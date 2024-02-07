@@ -370,13 +370,6 @@ def unhighlight(id_type, target):
         if user.perm not in current_app.config["CAN_HIGHLIGHT"]:
             raise InvalidCredentials
 
-        if not user.keys.key:
-            raise InvalidCredentials
-        # match password hashes
-        valid = check_password_hash(user.keys.key, key)
-        if not valid:
-            raise InvalidCredentials
-
         if id_type == 'slug':
             post = Post.query.filter_by(slug=target).first()
         if id_type == 'id':

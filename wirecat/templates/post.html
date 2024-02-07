@@ -2,52 +2,65 @@
 
 {% block css %}
 <link rel="stylesheet" href="/static/css/post.css">
+<link rel="stylesheet" href="/static/css/blog.css">
 {% endblock %}
 
-{% block content %}
-{% if logged_in %}
-    {% if auth_level == 'superadmin' %}        
-        <div class="section">
-            <h2>Stats for Admins</h2>
+{% block post %}
+    {% if logged_in %}
+        {% if auth_level == 'superadmin' %}        
+            <div class="section post">
+                <h2>Stats for Admins</h2>
 
-            <div class="post-stats">
-            <p>id: {{post.id}}</p>
-            <p>post_id: {{post.post_id}}</p>
-            <p>Featured: {{post.featured}}</p>
-            <p>published: {{post.published}}</p>
-            <p>author: {{post.author}}</p>
-            <p>author_id: {{post.author.id}}</p>
-            <p>Upvotes: {{post.meta.upvotes}}</p>
-            <p>Favorites: {{post.meta.favorites}}</p>
-            <p>Views: {{post.meta.views}} </p>
+                <div class="post-stats">
+                <p>id: {{post.id}}</p>
+                <p>post_id: {{post.post_id}}</p>
+                <p>Featured: {{post.featured}}</p>
+                <p>published: {{post.published}}</p>
+                <p>author: {{post.author}}</p>
+                <p>author_id: {{post.author.id}}</p>
+                <p>Upvotes: {{post.meta.upvotes}}</p>
+                <p>Favorites: {{post.meta.favorites}}</p>
+                <p>Views: {{post.meta.views}} </p>
 
+                </div>
             </div>
-        </div>
+        {% endif %}
     {% endif %}
-{% endif %}
-    <div class="post-head">
+        <div class="post-head section post">
+            <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
             <div class="post-info">
-                <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
                 <div class="post-info-text">
                     <h1>{{post.title}}</h1>
                     <p>Posted by <a href="/profiles/{{post.author.username}}" class="link">{{post.author}}</a> on <a href="/posts/{{post.publish_date}}" class="link">{{post.publish_date}}</a></p>
+                    <p class="post-summary">{{post.summary}}</p>
                 </div>
-                <!-- <div class="post-buttons">
-                    <div>f</div>
-                    <div>l</div>
-                    <div>s</div>
-                </div> -->
+                <div>Views: {{post.meta.views}}</div>
+                <!-- <div class="post-buttons"> -->
+                    <!-- <div>Views: {{post.meta.views}}</div> -->
+                    <!-- <div>l</div> -->
+                    <!-- <div>s</div> -->
+                <!-- </div> -->
             </div>
-            <p class="post-summary">{{post.summary}}</p>
+                
 
-    </div>
+        </div>
 
-    {{post.html_content | safe}}
-    <div class="subsection">final subsection</div>
-    <div class="section signature">
-        {% if post.author.profile.signature %}
-            <p>{{post.author.profile.signature}}</p>
-        {% endif %}
-        <a href="/profiles/{{post.author.username}}" class="link">View {{post.author.username}}'s profile</a>
-    </div>
+        {{post.html_content | safe}}
+        <div class="subsection post">final subsection</div>
+        <div class="section signature post">
+            {% if post.author.profile.signature %}
+                <p>{{post.author.profile.signature}}</p>
+            {% endif %}
+            <a href="/profiles/{{post.author.username}}" class="link">View {{post.author.username}}'s profile</a>
+        </div>
+{% endblock %}
+
+{% block post_jumpto%}
+<h2>Sidebar Item</h2>
+<h2>Sidebar Item</h2>
+<h2>Sidebar Item</h2>
+<h2>Sidebar Item</h2>
+<h2>Sidebar Item</h2>
+<h2>Sidebar Item</h2>
+<h2>Sidebar Item</h2>
 {% endblock %}

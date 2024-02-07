@@ -1,4 +1,8 @@
 {% extends 'main.html' %}
+
+{% block css %}
+{% endblock %}
+
 {% block title %}WIRECAT Blog{% endblock %}
 
 {% block nav %}
@@ -15,5 +19,53 @@
 {% endblock %}
 
 {% block content %}
+<div class="post-main">
+    {% block post %}
+    {% endblock %}
+</div>
+<div class="post-sidebar">
 
+    {% if random %}
+        <div class="random section">
+            <p>Other Cool Posts</p>
+            {% for post in random %}
+            <a href="/post/{{post.slug}}">
+                <div class="sidebar-block">
+                    <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
+                    <p>{{post.title}}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if latest %}
+        <div class="latest section">
+            <p>Latest Posts</p>
+            {% for post in latest %}
+            <a href="/post/{{post.slug}}">
+                <div class="sidebar-block">
+                    <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
+                    <p>{{post.title}}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% if featured %}
+    <div class="featured section">
+        <p>Featured Posts</p>
+        {% for post in featured %}
+        <a href="/post/{{post.slug}}">
+            <div class="sidebar-block">
+                <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
+                <p>{{post.title}}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% block post_sidebar %}
+    {% endblock %}
+</div>
 {% endblock %}
