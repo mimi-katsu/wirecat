@@ -32,7 +32,8 @@
             <a href="/post/{{post.slug}}">
                 <div class="sidebar-block">
                     <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
-                    <p>{{post.title}}</p>
+                    <p class="link">{{post.title}}</p>
+                    <p>{{post.summary}}</p>
                 </div>
             </a>
             {% endfor %}
@@ -45,7 +46,8 @@
             <a href="/post/{{post.slug}}">
                 <div class="sidebar-block">
                     <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
-                    <p>{{post.title}}</p>
+                    <p class="link">{{post.title}}</p>
+                    <p>{{post.summary}}</p>
                 </div>
             </a>
             {% endfor %}
@@ -59,7 +61,8 @@
         <a href="/post/{{post.slug}}">
             <div class="sidebar-block">
                 <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
-                <p>{{post.title}}</p>
+                <p class="link">{{post.title}}</p>
+                <p>{{post.summary}}</p>
             </div>
         </a>
         {% endfor %}

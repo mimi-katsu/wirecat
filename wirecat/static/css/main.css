@@ -189,3 +189,11 @@ body {
 .nav-icon {
   height: 2em;
 }
+
+.post-sidebar>.section { 
+  display: flex;
+  flex-wrap: wrap;
+}
+.post-sidebar {
+  max-width: 1100px;
+}
