@@ -33,35 +33,39 @@
         </a>
         </div>
     {% endif %}
+    {% if latest %}
     <div class="section">
 
-    <h2>Latest</h2>
-    <a href="/post/{{latest[0].slug}}">
-        <div class="carousel card">
-                <div class="post">
-                    <img src="/static/posts/{{latest[0].publish_date}}/{{latest[0].thumbnail}}" alt="" class="thumbnail">
-                    <div class="carousel-overlay">
-                        <p class="post-title">{{latest[0].title}}</p>
-                        <div class="black-overlay"></div>
+        <h2>Latest</h2>
+        <a href="/post/{{latest[0].slug}}">
+            <div class="carousel card">
+                    <div class="post">
+                        <img src="/static/posts/{{latest[0].publish_date}}/{{latest[0].thumbnail}}" alt="" class="thumbnail">
+                        <div class="carousel-overlay">
+                            <p class="post-title">{{latest[0].title}}</p>
+                            <div class="black-overlay"></div>
+                        </div>
                     </div>
-                </div>
-        </div>
-    </a>
+            </div>
+        </a>
     </div>
+    {% endif %}
+    {% if best %}
     <div class="section">
-    <h2>Recommended</h2>
-    <a href="/post/{{best[0].slug}}">
-        <div class="carousel card">
-                <div class="post">
-                    <img src="/static/posts/{{best[0].publish_date}}/{{best[0].thumbnail}}" alt="" class="thumbnail">
-                    <div class="carousel-overlay">
-                        <p class="post-title">{{best[0].title}}</p>
-                        <div class="black-overlay"></div>
+        <h2>Recommended</h2>
+        <a href="/post/{{best[0].slug}}">
+            <div class="carousel card">
+                    <div class="post">
+                        <img src="/static/posts/{{best[0].publish_date}}/{{best[0].thumbnail}}" alt="" class="thumbnail">
+                        <div class="carousel-overlay">
+                            <p class="post-title">{{best[0].title}}</p>
+                            <div class="black-overlay"></div>
+                        </div>
                     </div>
-                </div>
-        </div>
-    </a>
+            </div>
+        </a>
     </div>
+    {% endif %}
 </div>
 
 

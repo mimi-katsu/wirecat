@@ -19,7 +19,6 @@ from sqlalchemy.orm import joinedload
 from wirecat.db import User, Post, PostMeta, UserMeta, ApiKeys, Profile, Announcement
 from wirecat.util.catlib import catlib
 from wirecat.app import db
-
 wc_api = Blueprint('api', __name__)
 
 can_post = ['superadmin', 'admin', 'author']
@@ -172,12 +171,12 @@ def add_post():
                 summary=request.form.get('summary', None),
                 publish_date=f'{now.year}/{now.month}/{now.day}'
                 )
-            
+
             if request.form.get('thumbnail', None):
                 post.thumbnail = f'{post_id}-{request.form.get("thumbnail")}'
-            
             db.session.add(post)
             db.session.commit()
+
             #TODO:
             # Make sure that post files and database contents are both 
             # removed in the event that one or the other fails
@@ -188,7 +187,7 @@ def add_post():
             latest = Post.query.order_by(Post.publish_date.desc()).limit(5)
             to_cache = catlib.serialize_posts(latest)
             cache.set('latest', to_cache)
-
+            print("Post added to search index")
             response = jsonify(type='post', success=True, msg='Post was successfully uploaded'), 200
 
         except IntegrityError as e:
@@ -200,7 +199,7 @@ def add_post():
         except InvalidCredentials as e:
             response = jsonify(type='post', success=False, msg=f'{e}'), 200
         except Exception as e:
-            response = jsonify(type='feature', success=False, msg=f'{e}'), 200
+            response = jsonify(type='post', success=False, msg=f'{e}'), 200
         finally:
             if not response:
                 response = jsonify(error='Something Unexpected occured')
@@ -233,6 +232,7 @@ def delete_post(id_type, target):
         if meta:
             db.session.delete(meta)
         db.session.delete(post)
+        current_app.wc_search.remove_from_search_index(post.post_id)
         db.session.commit()
 
         response = jsonify(type='delete', success=True, msg='Post was successfully deleted'), 200
@@ -269,7 +269,7 @@ def publish(id_type, target):
 
         post.published = True
         db.session.commit()
-
+        current_app.wc_search.add_to_search_index(post_id=post.post_id,slug=post.slug,title=post.title, summary=post.summary, thumbnail=post.thumbnail,publish_date=post.publish_date)
         response = jsonify(type='publish', success=True, msg='Post was successfully published'), 200
 
     except InvalidCredentials as e:
@@ -305,7 +305,7 @@ def hide(id_type, target):
 
         post.published = False
         db.session.commit()
-
+        current_app.wc_search.remove_from_search_index(post.post_id)
         response = jsonify(type='hide', success=True, msg='Post was successfully hidden'), 200
 
     except InvalidCredentials as e:

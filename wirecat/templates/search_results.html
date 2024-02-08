@@ -1,0 +1,11 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="search-main">
+{% if results %}
+{% for post in results %}
+<div class="">{{post}}</div>
+{% endfor %}
+{% endif %}
+</div>
+{% endblock %}

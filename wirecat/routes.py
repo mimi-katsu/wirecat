@@ -11,6 +11,7 @@ from wirecat.db import User, Post, PostMeta, UserMeta, ApiKeys, Profile, Announc
 from wirecat.util.w_secrets import Secrets
 from wirecat.app import db
 from wirecat.util.catlib import catlib
+from wirecat.search import Search
 s = Secrets()
 
 wc = Blueprint('wirecat', __name__)
@@ -64,7 +65,7 @@ def home():
     for b in featured:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
-    return render_template('frontpage.html', featured=[featured[0]], latest= latest, best = best)
+    return render_template('frontpage.html', featured=featured, latest= latest, best = best)
 
 @wc.route('/profiles/<user_slug>')
 def profile(user_slug):
@@ -125,6 +126,16 @@ def blog_post(post_slug):
         abort(404)
     return render_template('post.html', post=post, featured=featured, latest=latest, random=random_posts)
 
+@wc.route('/search')
+def search():
+    return render_template('search.html')
+
+@wc.route('/search/<query>')
+def make_search(query):
+    results = current_app.wc_search.search_posts(query)
+    return render_template('search_results.html', results=results)
+
+
 @wc.route('/login')
 def login():
     return render_template('login.html')
@@ -165,8 +176,9 @@ def main_nav():
         announce = Announcement.query.order_by(Announcement.post_date.desc()) \
         .limit(1) \
         .first()
-        ann = announce.content
-        current_app.cache.set('announcement', ann)
+        if announce:
+            ann = announce.content
+            current_app.cache.set('announcement', ann)
     
     announcement = {"announcement": ann}
     return announcement

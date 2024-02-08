@@ -92,6 +92,11 @@ def create_app(test_config=None):
     cache = Cache(app)
     cache.init_app(app)
     app.cache = cache
+
+    from wirecat.search import Search
+    search = Search()
+    search.init_app(app)
+
     #Force a redirect to login page when JWT token is expired or doesnt exist. other wise Default returns json
     @jwt.unauthorized_loader
     def unauthorized_callback(error_string):
