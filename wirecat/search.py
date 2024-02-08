@@ -3,7 +3,7 @@ import os
 from flask import current_app
 from whoosh.index import open_dir,create_in, exists_in
 from whoosh.writing import AsyncWriter
-from whoosh.qparser import QueryParser
+from whoosh.qparser import MultifieldParser
 
 class Search:
     def __init__(self):
@@ -27,7 +27,7 @@ class Search:
     def search_posts(self, query_str):
         index = open_dir(self.index_path)
         with index.searcher() as searcher:
-            query = QueryParser("title", index.schema).parse(query_str)
+            query = MultifieldParser(["title", "summary", "publish_date"], index.schema).parse(query_str)
             results_obj = searcher.search(query)
             query_results = []
             for hit in results_obj:

@@ -91,22 +91,28 @@ body {
     background-color: var(--background-color-main);
 }
 
-/* #header-logo {
-  flex: 1;
-  max-width: 20em;
-  min-width: 15em;
-  height: auto;
-  display: inline-block;
+.header > * {
   padding: 1em;
-} */
+}
+
+.header .search-container {
+  padding: 1em;
+  display: flex;
+}
+input, button{
+  background-color: var(--background-color-secondary);
+  border: 2px solid var(--border-color-tertiary);
+  border-radius: 8px;
+  color: var(--font-color-main);
+}
 
 .main-nav {
   display: flex;
   flex-wrap: wrap;
-  justify-content: end;
+  justify-content: start;
   align-items: center;
-  padding-right: 1em;
 }
+
 
 .main-nav>a {
   color: var(--font-color-main);

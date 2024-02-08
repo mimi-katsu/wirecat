@@ -9,16 +9,8 @@
 </head>
 <body>
     <div class="header">
-        <div class="logo" id="header-logo">
-            <a href="/">
-
-            </a>
-        </div>
-
         <div class="main-nav">
                 <a href="/home" class="header-nav">Home</a>
-                <a href="/forum" class="header-nav">Forum</a>
-                <a href="/downloads" class="header-nav">Downloads</a>
                 {% if logged_in %}
                     <!-- Display profile button if logged in -->
                     <a href="/dashboard">Dashboard</a>
@@ -26,16 +18,22 @@
                 {% else %}
                     <!-- Display login button if not logged in -->
                     <a href="/login">Login</a>
-                {% endif %}       
+                {% endif %}
+        </div>
+        <div class="search-container">
+            <form action="/search" method="POST" class="search-bar">
+                <button type="submit">Search</button>
+                <input type="text" name="search" id="search-input" required>
+            </form>
         </div>
     </div>
 
     <div class="nav">{% block nav %}{% endblock %}</div>
+    {% if announcement %}
     <div class="announcement-bar">
-        {% if announcement %}
             <p>{{announcement | safe}}</p>
-        {% endif %} 
     </div>
+    {% endif %} 
     {% block banner%}
     {% endblock %}
     <div class="content">

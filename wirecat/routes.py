@@ -126,15 +126,26 @@ def blog_post(post_slug):
         abort(404)
     return render_template('post.html', post=post, featured=featured, latest=latest, random=random_posts)
 
-@wc.route('/search')
+@wc.route('/search',methods=['POST'])
 def search():
-    return render_template('search.html')
+    if request.method == 'POST':
+        query = request.form.get('search', None)
+        results = current_app.wc_search.search_posts(query)
+        best = current_app.cache.get('best')
+        if best:
+            best = catlib.deserialize_posts(best)
+        print(best)
+        return render_template('search_results.html', results=results, best=best)
 
-@wc.route('/search/<query>')
+@wc.route('/search/<query>', methods=['GET'])
 def make_search(query):
     results = current_app.wc_search.search_posts(query)
-    return render_template('search_results.html', results=results)
-
+    best = current_app.cache.get('best')
+    if best:
+        best = catlib.deserialize_posts(best)
+    if results:
+        return render_template('search_results.html', results=results)
+    return render_template('sorry.html', best=best)
 
 @wc.route('/login')
 def login():

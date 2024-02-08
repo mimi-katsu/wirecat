@@ -2,10 +2,22 @@
 
 {% block content %}
 <div class="search-main">
-{% if results %}
-{% for post in results %}
-<div class="">{{post}}</div>
-{% endfor %}
-{% endif %}
+    {% if results %}
+        {% for post in results %}
+            <div class="">{{post}}</div>
+        {% endfor %}
+    {% else %}
+        <p>Sorry we couldnt' find what you were looking for :(</p>
+    {% endif %}
+    {% if best %}
+        <div class="section">
+            {% for post in best %}
+                <div class="results-block">{{post}}</div>
+            {% endfor %}
+        </div>
+        
+    {% endif %}
 </div>
+
+
 {% endblock %}
