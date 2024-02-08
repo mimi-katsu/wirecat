@@ -7,68 +7,91 @@
 {% block title %}WIRECAT Home{% endblock %}
 
 {% block nav %}
-<div class="nav">
     <a href="/collection/best">Best</a>
     <a href="/collection/recent">Latest</a>
     <a href="/collection/programming">Programming</a>
     <a href="/collection/ctf">CTFs</a>
     <a href="/collections">Playlists</a>
-
-</div>
 {% endblock %}
-
+{% block banner%}
+    <div class="banner"><img src="/static/images/wirecat-banner.svg" alt="123"></div>
+{% endblock %}
 {% block content %}
 <div class="main-content">
     {% if featured %}
         <div class="section featured">
-        {% for p in featured %}
-        <a href="/post/{{p.slug}}">
+        <a href="/post/{{featured[0].slug}}">
             <div class="carousel card">
                     <div class="post">
-                        <img src="/static/posts/{{p.publish_date}}/{{p.thumbnail}}" alt="" class="thumbnail">
+                        <img src="/static/posts/{{featured[0].publish_date}}/{{featured[0].thumbnail}}" alt="" class="thumbnail">
                         <div class="carousel-overlay">
-                            <p class="post-title">{{p.title}}</p>
+                            <p class="post-title">{{featured[0].title}}</p>
                             <div class="black-overlay"></div>
                         </div>
                     </div>
             </div>
         </a>
-        {% endfor %}
         </div>
     {% endif %}
     <div class="section">
 
     <h2>Latest</h2>
-    {% for a in latest_posts %}
-    <a href="/post/{{a.slug}}">
+    <a href="/post/{{latest[0].slug}}">
         <div class="carousel card">
                 <div class="post">
-                    <img src="/static/posts/{{a.publish_date}}/{{a.thumbnail}}" alt="" class="thumbnail">
+                    <img src="/static/posts/{{latest[0].publish_date}}/{{latest[0].thumbnail}}" alt="" class="thumbnail">
                     <div class="carousel-overlay">
-                        <p class="post-title">{{a.title}}</p>
+                        <p class="post-title">{{latest[0].title}}</p>
                         <div class="black-overlay"></div>
                     </div>
                 </div>
         </div>
     </a>
-    {% endfor %}
     </div>
     <div class="section">
     <h2>Recommended</h2>
-    {% for b in best_posts %}
-    <a href="/post/{{b.slug}}">
+    <a href="/post/{{best[0].slug}}">
         <div class="carousel card">
                 <div class="post">
-                    <img src="/static/posts/{{b.publish_date}}/{{b.thumbnail}}" alt="" class="thumbnail">
+                    <img src="/static/posts/{{best[0].publish_date}}/{{best[0].thumbnail}}" alt="" class="thumbnail">
                     <div class="carousel-overlay">
-                        <p class="post-title">{{b.title}}</p>
+                        <p class="post-title">{{best[0].title}}</p>
                         <div class="black-overlay"></div>
                     </div>
                 </div>
         </div>
     </a>
-    {% endfor %}
     </div>
 </div>
 
+
+<div class="main-sidebar">
+
+    {% if best %}
+        <div class="best section sidebar">
+            {% for post in best %}
+            <a href="/post/{{post.slug}}">
+                <div class="sidebar-block">
+                    <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
+                    <p class="link">{{post.title}}</p>
+                    <p>{{post.summary}}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+    {% if latest %}
+        <div class="latest section sidebar">
+            {% for post in latest %}
+            <a href="/post/{{post.slug}}">
+                <div class="sidebar-block">
+                    <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
+                    <p class="link">{{post.title}}</p>
+                    <p>{{post.summary}}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

@@ -64,7 +64,7 @@ def home():
     for b in featured:
         if not b.thumbnail:
             b.thumbnail = '/static/images/default-thumb.png'
-    return render_template('frontpage.html', featured=featured, latest_posts = latest, best_posts = best)
+    return render_template('frontpage.html', featured=[featured[0]], latest= latest, best = best)
 
 @wc.route('/profiles/<user_slug>')
 def profile(user_slug):

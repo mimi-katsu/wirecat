@@ -91,14 +91,14 @@ body {
     background-color: var(--background-color-main);
 }
 
-#header-logo {
+/* #header-logo {
   flex: 1;
   max-width: 20em;
   min-width: 15em;
   height: auto;
   display: inline-block;
   padding: 1em;
-}
+} */
 
 .main-nav {
   display: flex;

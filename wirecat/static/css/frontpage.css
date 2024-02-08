@@ -2,7 +2,7 @@
 
 .carousel {
   overflow: hidden;
-  max-width: 600px;
+  max-width: 1000px;
 }
 
 .carousel>.post {
@@ -11,7 +11,7 @@
   top: 0;
   left: 0;
   border-radius: 8px;
-  height: auto;
+  max-height: 500px;
 
 }
 
@@ -55,5 +55,44 @@
 
 .main-content {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1100px;
+}
+
+.banner {
+  position: relative;
+  overflow: hidden;
+  top: 0;
+  left: 0;
+  margin-top: 1em;
+  max-height: 100px;
+
+}
+
+.main-sidebar {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  max-width: 1100px;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: center;
+  justify-content: space-around;
+}
+
+.sidebar-block {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 300px;
+  min-width: 150px;
+  margin:1em;
+}
+
+.sidebar-block img {
+  border-radius: 8px;
 }
