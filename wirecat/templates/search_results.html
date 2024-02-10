@@ -3,16 +3,26 @@
 {% block content %}
 <div class="search-main">
     {% if results %}
+        <p>Search Results</p>
         {% for post in results %}
-            <div class="">{{post}}</div>
+            <div class="section">
+                <a href="/post/{{post.slug}}"><h3 class="link">{{post.title}}</h3></a>
+                <p>{{post.author}}</p>
+                <p>{{post.publish_date}}</p>
+                <p>{{post.summary}}</p>
+            </div>
         {% endfor %}
     {% else %}
         <p>Sorry we couldnt' find what you were looking for :(</p>
     {% endif %}
     {% if best %}
+        <p>Take a look at these other coll posts too!</p>
         <div class="section">
             {% for post in best %}
-                <div class="results-block">{{post}}</div>
+                <a href="/post/{{post.slug}}"><h3 class="link">{{post.title}}</h3></a>
+                <p>{{post.author}}</p>
+                <p>{{post.publish_date}}</p>
+                <p>{{post.summary}}</p>
             {% endfor %}
         </div>
         
