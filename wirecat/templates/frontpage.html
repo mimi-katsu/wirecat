@@ -17,22 +17,23 @@
     <!-- <div class="banner"><img src="/static/images/wirecat-banner.svg" alt="123"></div> -->
 {% endblock %}
 {% block content %}
-<div class="main-content">
-    {% if featured %}
-        <div class="section featured">
-        <a href="/post/{{featured[0].slug}}">
-            <div class="carousel card">
-                    <div class="post">
-                        <img src="/static/posts/{{featured[0].publish_date}}/{{featured[0].thumbnail}}" alt="" class="thumbnail">
-                        <div class="carousel-overlay">
-                            <p class="post-title">{{featured[0].title}}</p>
-                            <div class="black-overlay"></div>
-                        </div>
-                    </div>
+{% if featured %}
+<div class="section main-head">
+<a href="/post/{{featured[0].slug}}">
+    <div class="carousel card">
+            <div class="post">
+                <img src="/static/posts/{{featured[0].publish_date}}/{{featured[0].thumbnail}}" alt="" class="thumbnail">
+                <div class="carousel-overlay">
+                    <p class="post-title">{{featured[0].title}}</p>
+                    <div class="black-overlay"></div>
+                </div>
             </div>
-        </a>
-        </div>
-    {% endif %}
+    </div>
+</a>
+</div>
+{% endif %}
+<div class="main-content">
+    
     {% if latest %}
     <div class="section">
 
@@ -66,6 +67,14 @@
         </a>
     </div>
     {% endif %}
+
+    <div class="section">
+        {% for post in latest %}
+            <a href="/post/{{post.slug}}"><h3 class="link">{{post.title}}</h3></a>
+            <p>&emsp;&emsp;{{post.summary[:250]}}...</p>        
+        {% endfor %}
+    </div>
+
 </div>
 
 
