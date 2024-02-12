@@ -7,25 +7,25 @@
         {% for post in results %}
             <div class="section">
                 <a href="/post/{{post.slug}}"><h3 class="link">{{post.title}}</h3></a>
-                <p>{{post.author}}</p>
-                <p>{{post.publish_date}}</p>
-                <p>{{post.summary}}</p>
+                <p class="subtext">&emsp;{{post.publish_date}}, Category: {{post.category}}, Tags: {{post.tags}}</p>
+                <p>&emsp;&emsp;{{post.summary[:250]}}...</p>
+                
             </div>
         {% endfor %}
     {% else %}
         <p>Sorry we couldnt' find what you were looking for :(</p>
     {% endif %}
     {% if best %}
-        <p>Take a look at these other coll posts too!</p>
-        <div class="section">
-            {% for post in best %}
-                <a href="/post/{{post.slug}}"><h3 class="link">{{post.title}}</h3></a>
-                <p>{{post.author}}</p>
-                <p>{{post.publish_date}}</p>
-                <p>{{post.summary}}</p>
-            {% endfor %}
-        </div>
+        <p>Take a look at these other cool posts!</p>
         
+        
+            {% for post in best %}
+            <div class="section">
+                <a href="/post/{{post.slug}}"><h3 class="link">{{post.title}}</h3></a>
+                <p class="subtext">&emsp;{{post.publish_date}}, Category: {{post.category}}, Tags: {{post.tags}}</p>
+                <p>&emsp;&emsp;{{post.summary[:250]}}...</p>
+            </div>
+            {% endfor %}        
     {% endif %}
 </div>
 

@@ -90,12 +90,12 @@ def post(args):
             for element in soup.descendants:
                 if isinstance(element, Comment):
                     element.extract()
-            data['title']= soup.title.text,
-            data['html_content']= soup.content.decode_contents(),
-            data['summary']= soup.summary.decode_contents(),
+            data['title']= soup.title.text
+            data['html_content']= soup.content.decode_contents()
+            data['summary']= soup.summary.decode_contents()
             data['thumbnail'] = soup.thumbnail.decode_contents()
             data['tags']= soup.tags.text
-
+            data['category']=soup.category.text
             img_soup = BeautifulSoup(post_content, 'html.parser')
             post_files = {}
             images = img_soup.find_all('img')

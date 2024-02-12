@@ -9,14 +9,15 @@ class Search:
     def __init__(self):
         self.index_path = "1"
         self.app = None
-    def add_to_search_index(self, post_id, slug, title, publish_date,summary,thumbnail):
-        print(self.index_path)
+    def add_to_search_index(self, post_id, slug, title, category, tags, publish_date, summary, thumbnail):
         ix = open_dir(self.index_path)
         writer = AsyncWriter(ix)
         writer.add_document(
             id=str(post_id),
             slug=slug,
             title=title,
+            category=category,
+            tags=tags,
             summary=summary,
             publish_date=publish_date,
             thumbnail=thumbnail
@@ -27,14 +28,16 @@ class Search:
     def search_posts(self, query_str):
         index = open_dir(self.index_path)
         with index.searcher() as searcher:
-            query = MultifieldParser(["title", "summary", "publish_date"], index.schema).parse(query_str)
+            query = MultifieldParser(["title", "summary", "publish_date", "tags", "category"], index.schema).parse(query_str)
             results_obj = searcher.search(query)
             query_results = []
             for hit in results_obj:
                 h = {
-                    'id':hit['id'],
-                    'title':hit['title'],
-                    'slug':hit['slug'],
+                    'id': hit['id'],
+                    'title': hit['title'],
+                    'slug': hit['slug'],
+                    'category': hit['category'],
+                    'tags': hit['tags'],
                     'publish_date': hit['publish_date'],
                     'summary': hit['summary'],
                     'thumbnail': hit['thumbnail']
@@ -55,6 +58,8 @@ class Search:
         slug=TEXT(stored=True),
         title=TEXT(stored=True),
         summary=TEXT(stored=True),
+        category=TEXT(stored=True),
+        tags=TEXT(stored=True),
         thumbnail=TEXT(stored=True),
         publish_date=TEXT(stored=True)
         )

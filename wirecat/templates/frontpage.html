@@ -78,7 +78,7 @@
                 <div class="sidebar-block">
                     <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
                     <p class="link">{{post.title}}</p>
-                    <p>{{post.summary}}</p>
+                    <p>{{post.summary[:100]}}...</p>
                 </div>
             </a>
             {% endfor %}
@@ -91,7 +91,7 @@
                 <div class="sidebar-block">
                     <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
                     <p class="link">{{post.title}}</p>
-                    <p>{{post.summary}}</p>
+                    <p>{{post.summary[:100]}}...</p>
                 </div>
             </a>
             {% endfor %}

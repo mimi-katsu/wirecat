@@ -167,6 +167,8 @@ def add_post():
                 user_id = user.id,
                 post_id = post_id,
                 slug=slug,
+                tags=request.form.get('tags', None),
+                category=request.form.get('category', None),
                 html_content=modified_html_content,
                 summary=request.form.get('summary', None),
                 publish_date=f'{now.year}/{now.month}/{now.day}'
@@ -269,7 +271,7 @@ def publish(id_type, target):
 
         post.published = True
         db.session.commit()
-        current_app.wc_search.add_to_search_index(post_id=post.post_id,slug=post.slug,title=post.title, summary=post.summary, thumbnail=post.thumbnail,publish_date=post.publish_date)
+        current_app.wc_search.add_to_search_index(post_id=post.post_id,slug=post.slug,title=post.title,tags=post.tags,category=post.category, summary=post.summary, thumbnail=post.thumbnail,publish_date=post.publish_date)
         response = jsonify(type='publish', success=True, msg='Post was successfully published'), 200
 
     except InvalidCredentials as e:

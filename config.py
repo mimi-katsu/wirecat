@@ -30,4 +30,4 @@ class Permissions:
     CAN_MAKE_ANNOUNCEMENTS = ['superadmin', 'admin']
 
 class Posts:
-    CATEGORIES = ['ctf', 'opinion', 'news', 'site', 'programming', 'homelab', 'guide', 'tool']
+    CATEGORIES = ['ctf', 'opinion', 'news', 'site', 'programming', 'lab', 'guide', 'tool']

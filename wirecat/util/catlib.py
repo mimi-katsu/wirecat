@@ -78,3 +78,20 @@ class catlib:
                         post = Post(id=obj['id'], post_id=obj['post_id'],slug=obj['slug'], title=obj['title'], summary=obj['summary'], thumbnail=obj['thumbnail'], publish_date=obj['publish_date'])
                         posts.append(post)
                 return posts
+
+        def get_default_thumb(post_category: str) -> str:
+                thumbs = {
+                        'ctf': 'ctf-thumb.jpg',
+                        'programming': 'prog-thumb.jpg',
+                        'news': 'news-thumb.jpg',
+                        'site': 'site-thumb.jpg',
+                        'opinion': 'op-thumb.jpg',
+                        'lab': 'lab-thumb.jpg',
+                        'guide': 'guide-thumb.jpeg',
+                        'tool': 'tool-thumb.jpeg'
+                }
+
+                if post_category not in thumbs.keys():
+                        return 'default-thumb.jpg'
+                else:
+                        return thumbs[post_category]

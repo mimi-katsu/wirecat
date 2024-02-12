@@ -134,7 +134,6 @@ def search():
         best = current_app.cache.get('best')
         if best:
             best = catlib.deserialize_posts(best)
-        print(best)
         return render_template('search_results.html', results=results, best=best)
 
 @wc.route('/search/<query>', methods=['GET'])

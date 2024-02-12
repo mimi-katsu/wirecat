@@ -14,6 +14,8 @@ class Post(db.Model):
     user_id:Mapped[int] = mapped_column(Integer, ForeignKey('user.id'), nullable=False)
     slug:Mapped[str] = mapped_column(String, unique=True, nullable=False)
     title:Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    tags:Mapped[str] = mapped_column(String, unique=False, nullable=True)
+    category:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     html_content:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     summary:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     thumbnail:Mapped[str] = mapped_column(String, unique=False, nullable=True)
@@ -31,7 +33,6 @@ class PostMeta(db.Model):
     views:Mapped[str] = mapped_column(Integer, unique=False, nullable=False, default=0)
     upvotes:Mapped[str] = mapped_column(Integer, unique=False, nullable=False, default=0)
     favorites:Mapped[str] = mapped_column(Integer, unique=False, nullable=False, default=0)
-    tags:Mapped[str] = mapped_column(String, unique=False, nullable=True)
     post = relationship('Post', backref=backref('meta', uselist=False))
 
     def __repr__(self):
