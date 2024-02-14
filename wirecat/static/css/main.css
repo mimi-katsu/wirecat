@@ -155,7 +155,7 @@ input, button{
   border: 2px solid var(--border-color-tertiary);
   border-radius: 8px;
   padding: 1em;
-  margin: 1em;
+  margin: .5em;
   background-color: var(--background-color-secondary);
   opacity: .9;
 }
@@ -185,7 +185,7 @@ input, button{
 }
 
 .announcement-bar {
-  padding: 1em;
+  margin-top: .5em;
   padding-bottom: 0;
   display: flex;
   justify-content: center;
@@ -211,11 +211,7 @@ input, button{
   color: var(--font-color-secondary);
 }
 
-/* .subtext {
-  align-self: center;
-  width: 65%;
-  font-size: .9em;
-  color: var(--font-color-secondary);
-  margin: 1em;
-} */
+.post-block {
+  border-bottom: 2px solid var(--border-color-tertiary);
+}
 

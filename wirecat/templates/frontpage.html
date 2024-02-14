@@ -70,8 +70,10 @@
 
     <div class="section">
         {% for post in latest %}
+        <div class="post-block">
             <a href="/post/{{post.slug}}"><h3 class="link">{{post.title}}</h3></a>
-            <p>&emsp;&emsp;{{post.summary[:250]}}...</p>        
+            <p>&emsp;&emsp;{{post.summary[:250]}}...</p>
+        </div>        
         {% endfor %}
     </div>
 
@@ -83,26 +85,31 @@
     {% if best %}
         <div class="best section sidebar">
             {% for post in best %}
-            <a href="/post/{{post.slug}}">
-                <div class="sidebar-block">
-                    <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
-                    <p class="link">{{post.title}}</p>
-                    <p>{{post.summary[:100]}}...</p>
-                </div>
-            </a>
+            <div class="post-block">
+                    <div class="sidebar-block">
+                        <a href="/post/{{post.slug}}">
+                        <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
+                        <p class="link">{{post.title}}</p>
+                        </a>
+                        <p>{{post.summary[:100]}}...</p>
+                    </div>
+
+            </div>
             {% endfor %}
         </div>
     {% endif %}
     {% if latest %}
         <div class="latest section sidebar">
             {% for post in latest %}
-            <a href="/post/{{post.slug}}">
-                <div class="sidebar-block">
-                    <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
-                    <p class="link">{{post.title}}</p>
-                    <p>{{post.summary[:100]}}...</p>
-                </div>
-            </a>
+            <div class="post-block">
+                    <div class="sidebar-block">
+                        <a href="/post/{{post.slug}}">
+                            <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
+                            <p class="link">{{post.title}}</p>
+                        </a>
+                        <p>{{post.summary[:100]}}...</p>
+                    </div>
+            </div>
             {% endfor %}
         </div>
     {% endif %}

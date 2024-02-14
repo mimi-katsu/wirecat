@@ -128,14 +128,6 @@ li {
     margin: 1em;
 }
 
-.subtext {
-    align-self: center;
-    width: 65%;
-    font-size: .9em;
-    color: var(--font-color-secondary);
-    margin: 1em;
-}
-
 .subsection {
     align-self: center;
     display: flex;

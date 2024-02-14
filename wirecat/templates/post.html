@@ -32,6 +32,7 @@
                 <div class="post-info-text">
                     <h1>{{post.title}}</h1>
                     <p>Posted by <a href="/profiles/{{post.author.username}}" class="link">{{post.author}}</a> on <a href="/posts/{{post.publish_date}}" class="link">{{post.publish_date}}</a></p>
+                    <p class="subtext">Category: {{post.category}} Tags: {{post.tags}}</p>
                     <p class="post-summary">{{post.summary}}</p>
                 </div>
                 <div>Views: {{post.meta.views}}</div>

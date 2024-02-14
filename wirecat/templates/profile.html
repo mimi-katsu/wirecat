@@ -5,27 +5,31 @@
 {% endblock %}
 
 {% block content %}
-<div class="section">
-<p>{{user.email}}</p>
-<p>{{user.first_name}}</p>
-<p>{{user.last_name}}</p>
-<p>{{user.profile.about}}</p>
-<p>{{user.profile.gender}}</p>
-<p>{{user.profile.dob}}</p>
-<p>{{user.profile.signature}}</p>
+<div class="about">
+    <div class="section about-main">
+        <img src="/static/images/hacker-cat.jpg" alt="">
+        <p>{{user.username}}</p>
+    </div>
+    <div class="section about-text">
+        <p>{{user.email}}</p>
+        <p>{{user.first_name}}</p>
+        <p>{{user.last_name}}</p>
+        <p>{{user.profile.about}}</p>
+        <p>{{user.profile.gender}}</p>
+        <p>{{user.profile.dob}}</p>
+        <p>{{user.profile.signature}}</p>
+    </div>
 </div>
-
 {% if posts %}
+<div class="section author-posts">
     {% for post in posts %}
-    <div class="section">
-        <img src="/static/posts/{{post.publish_date}}/{{post.thumbnail}}" alt="">
-        <div class="post-info">
+        <div class="post-block">
             <a href="/post/{{post.slug}}" class="link">{{post.title}}</a>
             <p>{{post.publish_date}}</p>
-            <p>{{post.summary}}</p>
+            <p>{{post.summary[:250]}}</p>
         </div>
-    </div>
     {% endfor %}
+</div>
 {% endif %}
 {% endblock %}    
 
